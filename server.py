@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from pymodm import connect, MongoModel, fields
 from pymodm import errors as pymodm_errors
+from datetime import datetime
+from helper import timestamp_format, validate_input_dict
 
 
 from database import Patient
@@ -105,6 +107,42 @@ def update_patient(input_dict, timestamp):
     return result
 
 
+def patient_upload_driver(input_dict, timestamp):
+    """Implements the /api/patient/upload route to upload patient
+    information to the database
+
+    This function implements the /api/patient/upload. The input
+    dictionary of the post request is sent to this function as an
+    argument, as well as the timestamp when the request was received.
+    The function then validate the input dictionary. If the validation
+    passes, the function checks whether the patient exists in the
+    database. If so, it calls another function to update the information
+    of the existing patient. Otherwise, it calls another function to create
+    new entry for the patient in the database. The result and status code
+    is returned.
+
+    :param input_dict: dictionary containing the new patient's
+                       information
+    :param timestamp: str containing the time when the patient
+                      is post to the server
+
+    :returns: str containing the upload result
+    :returns: int containing status code
+    """
+    if not validate_input_dict(input_dict,
+                               {"MRN": [int],
+                                "name": [str],
+                                "medical_image": [str],
+                                "heart_rate": [int],
+                                "ECG_image": [str]}):
+        return "The input is not a dictionary with correct format", 400
+    if has_patient(input_dict['MRN']):
+        result = update_patient(input_dict, timestamp)
+        return "Updated information of patient #" + str(result.MRN), 200
+    result = add_patient(input_dict, timestamp)
+    return "Added patient #" + str(result) + " to database", 200
+
+
 @app.route("/", methods=["GET"])
 def status():
     """Server status route
@@ -117,6 +155,38 @@ def status():
     :returns: None
     """
     return "Server On"
+
+
+@app.route("/api/patient/upload", methods=["GET", "POST"])
+def patient_upload_handler():
+    """Handles request to the /api/patient/upload route for uploading
+    patient information
+
+    The /api/patient/upload is a POST request that should receive a
+    JSON-encoded string with the following format:
+    {
+        "MRN": <medical_record_number>,
+        "name": <patient_name_str>,
+        "medical_image": <medical_image_base64_str>,
+        "heart_rate": <heart_rate_int>,
+        "ECG_image": <ECG_image_base64_str>
+    }
+    The function then calls a driver function that implements the functionality
+    of this route and receives an "answer" and "status_code" from this
+    driver function.  Finally, it returns the "answer" using jsonify and the
+    status_code.
+
+    :param: None
+
+    :returns: str containing the return message
+    :returns: int containing status code
+    """
+    input_dict = request.get_json()
+    answer, status_code = patient_upload_driver(
+        input_dict,
+        timestamp_format(datetime.now())
+    )
+    return jsonify(answer), status_code
 
 
 if __name__ == "__main__":
