@@ -16,9 +16,8 @@ def main_window():
     root.title("Monitoring Station")
     root.geometry("600x800")
 
-    ttk.Label(root, text="Blood Donor Database").grid(column=0, row=0,
-                                                      columnspan=4,
-                                                      sticky=tk.W)
+    ttk.Label(root, text="Blood Donor Database").grid(
+        column=0, row=0, columnspan=4, sticky=tk.W)
 
     # Patient MRN selection
     ttk.Label(root, text="Patient MRN:").grid(column=0, row=1,
@@ -35,22 +34,23 @@ def main_window():
     ttk.Label(root, text="Patient name:").grid(column=0, row=2,
                                                padx=5, pady=5,
                                                sticky=tk.W)
-    name_entry = tk.StringVar()
-    name_entry.set("None")
+    name_label = tk.StringVar()
+    name_label.set("None")
     # Will be replaced by the name of the selected patient
-    ttk.Label(root, textvariable=name_entry).grid(column=1, row=2,
+    ttk.Label(root, textvariable=name_label).grid(column=1, row=2,
                                                   padx=5, pady=5,
                                                   sticky=tk.W)
 
-    # Heart rate
+    # Latest heart rate
     ttk.Label(root, text="Latest heart rate:").grid(column=0, row=3,
                                                     padx=5, pady=5,
                                                     sticky=tk.W)
-    heart_rate_entry = tk.StringVar()
-    heart_rate_entry.set("None")
-    ttk.Label(root, textvariable=heart_rate_entry).grid(column=1, row=3,
-                                                        padx=5, pady=5,
-                                                        sticky=tk.W)
+    latest_heart_rate_label = tk.StringVar()
+    latest_heart_rate_label.set("None")
+    # Will be replaced by Latest heart rate of the selected patient
+    ttk.Label(root, textvariable=latest_heart_rate_label).grid(column=1, row=3,
+                                                               padx=5, pady=5,
+                                                               sticky=tk.W)
 
     root.mainloop()
 
