@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from pymodm import connect, MongoModel, fields
+from pymodm import errors as pymodm_errors
 
 
 from database import Patient
@@ -33,6 +34,7 @@ def add_patient(input_dict, timestamp):
                        information
     :param timestamp: str containing the time when the patient
                       is post to the server
+
     :returns: int containing MRN of the patient added
     """
     p = Patient(MRN=input_dict['MRN'],
@@ -51,6 +53,24 @@ def add_patient(input_dict, timestamp):
         p.ECG_timestamp.append(timestamp)
     result = p.save()
     return result.MRN
+
+
+def has_patient(MRN):
+    """Determine whether the given patient exists in the database
+
+    This function takes the MRN and check if the patient with
+    the given MRN is in the database.
+
+    :param MRN: int containing the medical record number
+
+    :returns: boolean containing whether the given MRN exists
+              in the database
+    """
+    try:
+        p = Patient.objects.raw({"_id": MRN}).first()
+    except pymodm_errors.DoesNotExist:
+        return False
+    return True
 
 
 @app.route("/", methods=["GET"])
