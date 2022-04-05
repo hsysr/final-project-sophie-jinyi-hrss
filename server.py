@@ -73,6 +73,38 @@ def has_patient(MRN):
     return True
 
 
+def update_patient(input_dict, timestamp):
+    """Update existing patient to database
+
+    This function update the document of an existing patient
+    in the database. If any information of medical image or
+    ECG is given, this information and the corresponding
+    timestamp will also be added to the document. If a
+    patient name is given, the old patient name will be
+    replaced by this name.
+
+    :param input_dict: dictionary containing the new patient's
+                       information
+    :param timestamp: str containing the time when the patient
+                      is post to the server
+
+    :returns: Patient containing the patient's updated data
+    entry
+    """
+    p = Patient.objects.raw({"_id": input_dict['MRN']}).first()
+    if input_dict['name'] != '':
+        p.name = input_dict['name']
+    if input_dict['medical_image'] != '':
+        p.medical_image.append(input_dict['medical_image'])
+        p.medical_timestamp.append(timestamp)
+    if input_dict['ECG_image'] != '':
+        p.ECG_image.append(input_dict['ECG_image'])
+        p.heart_rate.append(input_dict['heart_rate'])
+        p.ECG_timestamp.append(timestamp)
+    result = p.save()
+    return result
+
+
 @app.route("/", methods=["GET"])
 def status():
     """Server status route
