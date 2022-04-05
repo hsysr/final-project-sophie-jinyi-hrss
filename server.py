@@ -21,24 +21,34 @@ def init_server():
             "myFirstDatabase?retryWrites=true&w=majority")
 
 
-def add_patient(MRN):
+def add_patient(input_dict, timestamp):
     """Add new patient to database
 
     This function add the document of a new patient to mongodb.
-    The new document has the given MRN, and other fields are
-    set to blank.
+    If any information of medical image or ECG is given, this
+    information and the corresponding timestamp will also be
+    added to the document.
 
-    :param MRN: int containing the patient's medical record number
-
+    :param input_dict: dictionary containing the new patient's
+                       information
+    :param timestamp: str containing the time when the patient
+                      is post to the server
     :returns: int containing MRN of the patient added
     """
-    p = Patient(MRN=MRN,
-                name='',
+    p = Patient(MRN=input_dict['MRN'],
+                name=input_dict['name'],
                 medical_image=[],
                 medical_timestamp=[],
                 heart_rate=[],
                 ECG_image=[],
                 ECG_timestamp=[])
+    if input_dict['medical_image'] != '':
+        p.medical_image.append(input_dict['medical_image'])
+        p.medical_timestamp.append(timestamp)
+    if input_dict['ECG_image'] != '':
+        p.ECG_image.append(input_dict['ECG_image'])
+        p.heart_rate.append(input_dict['heart_rate'])
+        p.ECG_timestamp.append(timestamp)
     result = p.save()
     return result.MRN
 
