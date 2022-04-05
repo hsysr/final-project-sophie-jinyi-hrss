@@ -52,6 +52,29 @@ def main_window():
                                                                padx=5, pady=5,
                                                                sticky=tk.W)
 
+    # Latest ECG image
+    ttk.Label(root, text="Latest ECG image:").grid(column=0, row=4,
+                                                   padx=5, pady=5,
+                                                   sticky=tk.W)
+    # replaced using blank image here
+    blank_image = Image.open("images/acl1.jpg").resize((200, 100))
+    tk_blank_image = ImageTk.PhotoImage(blank_image)
+    latest_ECG_label = ttk.Label(root, image=tk_blank_image)
+    latest_ECG_label.grid(column=0, row=5,
+                          padx=5, pady=5,
+                          rowspan=2, sticky=tk.W)
+
+    # Latest ECG image datatime
+    ttk.Label(root, text="Date of latest ECG image:").grid(column=0, row=6,
+                                                           padx=5, pady=5,
+                                                           sticky=tk.W)
+    date_latest_ECG_label = tk.StringVar()
+    date_latest_ECG_label.set("None")
+    # Will be replaced by date_latest_ECG_label
+    ttk.Label(root, textvariable=date_latest_ECG_label).grid(column=1, row=6,
+                                                             padx=5, pady=5,
+                                                             sticky=tk.W)
+
     root.mainloop()
 
 
