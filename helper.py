@@ -41,3 +41,23 @@ def validate_input_dict(input_dict, validation_dict):
         else:
             return False
     return True
+
+
+def num_parse(input_str):
+    """Parse the input string into an integer
+
+    This function tries to cast the input string into an integer.
+    If the string does not represent a valid integer, the function
+    will return None
+
+    :param input_str: string containing the input
+
+    :returns: int containing the correspoding integer if the
+              string is valid, None otherwise
+    """
+    try:
+        num = int(input_str)
+    except ValueError:
+        return None
+    else:
+        return num

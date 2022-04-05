@@ -9,7 +9,7 @@ import pytest
     [[1, 2, 3], [str, list], True]
 ])
 def test_type_check(value, types, expected):
-    from validate import type_check
+    from helper import type_check
     answer = type_check(value, types)
     assert answer == expected
 
@@ -70,6 +70,19 @@ def test_type_check(value, types, expected):
      False]
 ])
 def test_validate_input_dict(input_dict, validation_dict, expected):
-    from validate import validate_input_dict
+    from helper import validate_input_dict
     answer = validate_input_dict(input_dict, validation_dict)
+    assert answer == expected
+
+
+@pytest.mark.parametrize("s, expected", [
+    ["1", 1],
+    ["114514", 114514],
+    ["1a", None],
+    [".", None],
+    ["", None]
+])
+def test_num_parse(s, expected):
+    from helper import num_parse
+    answer = num_parse(s)
     assert answer == expected
