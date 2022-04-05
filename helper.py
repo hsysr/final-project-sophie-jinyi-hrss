@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def type_check(value, types):
     """Check whether the input value is of certain types
 
@@ -61,3 +64,18 @@ def num_parse(input_str):
         return None
     else:
         return num
+
+
+def timestamp_format(timestamp):
+    """Format the timestamp to format of '%Y-%m-%d %H:%M:%S'
+
+    This function tries to cast the input string datetime object into a string.
+    A return should be in format as shown by the example "2018-03-09 11:00:36".
+
+    :param timestamp: datetime containing the correspoding timestamp
+
+    :returns: timestamp_string: string containing the datatime with the
+              format of '%Y-%m-%d %H:%M:%S'
+    """
+    timestamp_string = datetime.strftime(timestamp, '%Y-%m-%d %H:%M:%S')
+    return timestamp_string
