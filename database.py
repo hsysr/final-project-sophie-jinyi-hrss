@@ -21,9 +21,9 @@ class Patient(MongoModel):
     """
 
     MRN = fields.IntegerField(primary_key=True)
-    name = fields.CharField()
-    medical_image = fields.ListField()
-    medical_timestamp = fields.ListField()
-    heart_rate = fields.ListField()
-    ECG_image = fields.ListField()
-    ECG_timestamp = fields.ListField()
+    name = fields.CharField(blank=True)
+    medical_image = fields.ListField(blank=True)
+    medical_timestamp = fields.ListField(blank=True)
+    heart_rate = fields.ListField(blank=True)
+    ECG_image = fields.ListField(blank=True)
+    ECG_timestamp = fields.ListField(blank=True)
