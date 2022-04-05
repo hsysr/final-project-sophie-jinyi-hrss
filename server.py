@@ -1,7 +1,23 @@
 from flask import Flask, request, jsonify
+from pymodm import connect, MongoModel, fields
+
+
+from database import Patient
 
 
 app = Flask(__name__)
+
+
+def init_server():
+    """Initializes server conditions
+    This function initializes the server to connect to the database
+
+    :param: None
+
+    :returns: None
+    """
+    connect("mongodb+srv://Sophie:bme547@cluster0.yzku1.mongodb.net/"
+            "myFirstDatabase?retryWrites=true&w=majority")
 
 
 @app.route("/", methods=["GET"])
@@ -19,4 +35,5 @@ def status():
 
 
 if __name__ == "__main__":
+    init_server()
     app.run(host="0.0.0.0")
