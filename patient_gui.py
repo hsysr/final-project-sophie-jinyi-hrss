@@ -20,8 +20,13 @@ def main_window():
     information for eventual upload to a heart rate database server.
     Entires on the GUI include patient MRN, patient name, medical
     image and ECG data.
-
     """
+    def medical_image_cmd():
+        """ Clear all entry upon click of "Clear" button
+        When the user clicks on the "Clear" button, this function is run
+        which clear all entry in the GUI window and change back to inital.
+        """
+        pass
 
     # Create root/base window
     root = tk.Tk()
@@ -34,9 +39,20 @@ def main_window():
     ttk.Entry(root, width=20, textvariable=name_entry).grid(column=1, row=1)
 
     # Patient Name Entry
-    ttk.Label(root, text="Name:").grid(column=0, row=2, padx=20, pady=0)
+    ttk.Label(root, text="Name:")\
+       .grid(column=0, row=2, padx=20, pady=0, sticky='n')
     id_entry = tk.StringVar()
-    ttk.Entry(root, width=20, textvariable=id_entry).grid(column=1, row=2)
+    ttk.Entry(root, width=20, textvariable=id_entry)\
+       .grid(column=1, row=2, sticky='n')
+
+    # Select Medical Image
+    ttk.Button(root, text="Select Medical Image", command=medical_image_cmd)\
+       .grid(column=2, row=1, padx=60, pady=5)
+    blank_image = Image.open("images/blank-avatar.jpg").resize((300, 150))
+    medical_image = ImageTk.PhotoImage(blank_image)
+    medical_image_label = ttk.Label(root, image=medical_image)
+    medical_image_label\
+        .grid(column=2, row=2, padx=140, pady=5, rowspan=2, columnspan=2)
 
     # Start GUI
     root.mainloop()
