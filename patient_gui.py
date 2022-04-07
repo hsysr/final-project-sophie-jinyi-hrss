@@ -28,6 +28,16 @@ def main_window():
     root.title("Patient-side Client")
     root.geometry("800x500")
 
+    # Patient MRN Entry
+    ttk.Label(root, text="MRN:").grid(column=0, row=1, padx=20, pady=20)
+    name_entry = tk.StringVar()
+    ttk.Entry(root, width=20, textvariable=name_entry).grid(column=1, row=1)
+
+    # Patient Name Entry
+    ttk.Label(root, text="Name:").grid(column=0, row=2, padx=20, pady=0)
+    id_entry = tk.StringVar()
+    ttk.Entry(root, width=20, textvariable=id_entry).grid(column=1, row=2)
+
     # Start GUI
     root.mainloop()
 
