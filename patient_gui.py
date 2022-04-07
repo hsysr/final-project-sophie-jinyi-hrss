@@ -83,8 +83,8 @@ def main_window():
     ECG_image_label\
         .grid(column=2, row=5, padx=140, pady=5,
               rowspan=2, columnspan=2, sticky='w')
-    ttk.Label(root, text="Heart Rate:")\
-       .grid(column=2, row=7, padx=140, pady=20, sticky='w')
+    hr_label = ttk.Label(root, text="Heart Rate:")
+    hr_label.grid(column=2, row=7, padx=140, pady=20, sticky='w')
 
     # Buttons
     ttk.Button(root, text="Clear", command=clear_cmd)\
@@ -93,6 +93,10 @@ def main_window():
        .grid(column=2, row=8, padx=300, sticky='w')
     ttk.Button(root, text="Cancel", command=cancel_cmd)\
        .grid(column=2, row=8, padx=405, sticky='w')
+
+    # Status Label
+    status_label = ttk.Label(root, text="Please Enter Patient information")
+    status_label.grid(column=0, row=7, padx=20, columnspan=3, sticky='w')
 
     # Start GUI
     root.mainloop()
