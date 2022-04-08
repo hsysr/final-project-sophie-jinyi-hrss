@@ -174,7 +174,10 @@ def retrieve_patient_driver(MRN):
     :returns: An instance of Patient class, containing all the record
     :returns: int of status_code
     """
-    patient = Patient.objects.raw({"_id": MRN}).first()
+    try:
+        patient = Patient.objects.raw({"_id": MRN}).first()
+    except pymodm_errors.DoesNotExist:
+        return "Patient_id {} was not found".format(MRN), 400
     return patient, 200
 
 
