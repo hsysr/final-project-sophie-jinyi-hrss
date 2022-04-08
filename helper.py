@@ -82,7 +82,7 @@ def timestamp_format(timestamp):
     return timestamp_string
 
 
-def image2b64(filename):
+def file_to_b64_string(filename):
     """Convert image to base64 string
 
     This function tries to open an image file, and encode the image file into
@@ -96,3 +96,21 @@ def image2b64(filename):
         b64_bytes = base64.b64encode(image_file.read())
     b64_string = str(b64_bytes, encoding='utf-8')
     return b64_string
+
+
+def b64_string_to_file(b64_string, filename):
+    """Convert base64 string to image file
+
+    This function takes a base64 string, decode the string
+    and save it as an image file
+
+    :param b64_string: str containing the base64 string
+    :param filename: str containing the file path to save
+                     the image
+
+    :returns: None
+    """
+    image_bytes = base64.b64decode(b64_string)
+    with open(filename, "wb") as out_file:
+        out_file.write(image_bytes)
+    return None
