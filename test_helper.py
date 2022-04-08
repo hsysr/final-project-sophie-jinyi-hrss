@@ -97,3 +97,33 @@ def test_timestamp_format(timestamp, expected):
     from helper import timestamp_format
     answer = timestamp_format(timestamp)
     assert answer == expected
+
+
+@pytest.mark.parametrize("filename, expected", [
+    ['images/acl1.jpg', '/9j/4AAQSkZJRgABAgAA'],
+    ['images/acl2.jpg', '/9j/4AAQSkZJRgABAgAA'],
+    ['images/blank-avatar.jpg', 'iVBORw0KGgoAAAANSUhE'],
+    ['images/synpic50411.jpg', '/9j/4AAQSkZJRgABAgAA']
+])
+def test_file_to_b64_string(filename, expected):
+    from helper import file_to_b64_string
+    answer = file_to_b64_string(filename)
+    assert answer[:20] == expected
+
+
+@pytest.mark.parametrize("filename, filename_out", [
+    ['images/acl1.jpg', 'images/acl1_output.jpg'],
+    ['images/acl2.jpg', 'images/acl2_output.jpg'],
+    ['images/blank-avatar.jpg', 'images/blank-avatar_output.jpg'],
+    ['images/synpic50411.jpg', 'images/synpic50411_output.jpg']
+])
+def test_b64_string_to_file(filename, filename_out):
+    from helper import file_to_b64_string
+    from helper import b64_string_to_file
+    import filecmp
+    import os
+    b64str = file_to_b64_string(filename)
+    b64_string_to_file(b64str, filename_out)
+    answer = filecmp.cmp(filename, filename_out)
+    os.remove(filename_out)
+    assert answer is True
