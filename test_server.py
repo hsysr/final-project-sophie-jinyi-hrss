@@ -1,8 +1,9 @@
 import pytest
-from server import init_server
+from pymodm import connect
 
 
-init_server()
+connect("mongodb+srv://Sophie:bme547@cluster0.yzku1.mongodb.net/"
+        "test_final?retryWrites=true&w=majority")
 
 
 @pytest.mark.parametrize("info_for_test", [
@@ -162,5 +163,23 @@ def test_patient_upload_driver(input_dict, expt_ans, expt_code):
 def test_retrieve_mrnlist_driver():
     from server import retrieve_mrnlist_driver
     answer, status_code = retrieve_mrnlist_driver()
-    assert answer == [5]
+    assert answer == []
+    assert status_code == 200
+
+
+def test_retrieve_patient_driver():
+    from server import retrieve_patient_driver
+    from database import Patient
+    test_patient = Patient(
+        MRN=2,
+        name='Alex.M',
+        medical_image=[],
+        medical_timestamp=[],
+        heart_rate=[],
+        ECG_image=[],
+        ECG_timestamp=[])
+    test_patient.save()
+    answer, status_code = retrieve_patient_driver(2)
+    Patient.objects.raw({"_id": 2}).first().delete()
+    assert answer == test_patient
     assert status_code == 200
