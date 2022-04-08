@@ -174,11 +174,16 @@ def retrieve_patient_driver(MRN):
     :returns: An instance of Patient class, containing all the record
     :returns: int of status_code
     """
-    try:
-        patient = Patient.objects.raw({"_id": MRN}).first()
-    except pymodm_errors.DoesNotExist:
-        return "Patient_id {} was not found".format(MRN), 400
-    return patient, 200
+    from helper import num_parse
+    MRN = num_parse(MRN)
+    if MRN is None:
+        return "MRN is not a valid integer.", 400
+    else:
+        try:
+            patient = Patient.objects.raw({"_id": MRN}).first()
+        except pymodm_errors.DoesNotExist:
+            return "Patient_id {} was not found".format(MRN), 400
+        return patient, 200
 
 
 @app.route("/", methods=["GET"])
