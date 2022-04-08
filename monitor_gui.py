@@ -23,7 +23,19 @@ def main_window():
         When the user clicks on the "Clear" button, this function is run
         which clear all entry in the GUI window and change back to inital.
         """
-        pass
+        MRN_entry.set("Select patient MRN")
+        name_label.set("None")
+        latest_heart_rate_label.set("None")
+        latest_ECG_label.image = tk_blank_image_latest_ECG
+        date_latest_ECG_label.set("None")
+        ECG_entry.set("Select ECG image")
+        selected_heart_rate_label.set("None")
+        selected_ECG_label.image = tk_blank_image_selected_ECG
+        date_selected_ECG_label.set("None")
+        med_entry.set("Select medical image")
+        selected_medical_label.image = tk_blank_image_selected_med
+        date_selected_med_label.set("None")
+        status_label.configure(text="Status")
 
     def download_cmd():
         """ Download images upon click of "Download" button
@@ -51,7 +63,7 @@ def main_window():
     # Create root/base window
     root = tk.Tk()
     root.title("Monitoring Station")
-    root.geometry("800x700")
+    root.geometry("800x780")
 
     # Patient MRN selection
     ttk.Label(root, text="Patient MRN:").grid(
@@ -85,7 +97,7 @@ def main_window():
     # Latest ECG image
     ttk.Label(root, text="Latest ECG image:").grid(
         column=0, row=3, padx=5, pady=5, sticky=tk.W)
-    blank_image_latest_ECG = Image.open("images/acl1.jpg").resize((200, 100))
+    blank_image_latest_ECG = Image.open("images/acl1.jpg").resize((150, 150))
     tk_blank_image_latest_ECG = ImageTk.PhotoImage(blank_image_latest_ECG)
     latest_ECG_label = ttk.Label(root, image=tk_blank_image_latest_ECG)
     latest_ECG_label.grid(
@@ -129,7 +141,7 @@ def main_window():
     # Display selected ECG image
     ttk.Label(root, text="Selected ECG image:").grid(
         column=2, row=3, padx=5, pady=5, sticky=tk.W)
-    blank_image_selected_ECG = Image.open("images/acl1.jpg").resize((200, 100))
+    blank_image_selected_ECG = Image.open("images/acl1.jpg").resize((150, 150))
     tk_blank_image_selected_ECG = ImageTk.PhotoImage(blank_image_selected_ECG)
     selected_ECG_label = ttk.Label(root, image=tk_blank_image_selected_ECG)
     selected_ECG_label.grid(
@@ -166,7 +178,7 @@ def main_window():
     # Display medical image
     ttk.Label(root, text="Selected medical image:").grid(
         column=0, row=10, padx=5, pady=5, sticky=tk.W)
-    blank_image_selected_med = Image.open("images/acl1.jpg").resize((200, 100))
+    blank_image_selected_med = Image.open("images/acl1.jpg").resize((150, 150))
     tk_blank_image_selected_med = ImageTk.PhotoImage(blank_image_selected_med)
     selected_medical_label = ttk.Label(root, image=tk_blank_image_selected_med)
     selected_medical_label.grid(
