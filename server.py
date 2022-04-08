@@ -158,6 +158,29 @@ def retrieve_mrnlist_driver():
     return mrnlist, 200
 
 
+def retrieve_patient_driver(MRN):
+    """Implements the /api/station/<MRN> route for retrieving
+    record of the patient according to given MRN.
+
+    This function implements the /api/station/<MRN> route that should return a
+    class that contains the full information of a patient with the given MRN
+
+    It returns patient class as "answer" and a "status_code" from this
+    driver function.  Finally, it returns the "answer" using jsonify and the
+    status_code.
+
+    :param MRN: integer of the query patient MRN
+
+    :returns: An instance of Patient class, containing all the record
+    :returns: int of status_code
+    """
+    try:
+        patient = Patient.objects.raw({"_id": MRN}).first()
+    except pymodm_errors.DoesNotExist:
+        return "Patient_id {} was not found".format(MRN), 400
+    return patient, 200
+
+
 @app.route("/", methods=["GET"])
 def status():
     """Server status route
@@ -222,6 +245,28 @@ def retrieve_mrnlist_handler():
     :returns: list of integers, containing list of existed patient MRN
     """
     answer, status_code = retrieve_mrnlist_driver()
+    return jsonify(answer), status_code
+
+
+@app.route("/api/station/<MRN>", methods=["GET"])
+def retrieve_patient_handler(MRN):
+    """Handles request to the /api/station/<MRN> route for retrieving
+    record of the patient according to given MRN.
+
+    The /api/station/<MRN> is a GET request that should return a
+    class that contains the full information of a patient with the given MRN
+
+    The function then calls a driver function that implements the functionality
+    of this route and receives an "answer" and "status_code" from this
+    driver function.  Finally, it returns the "answer" using jsonify and the
+    status_code.
+
+    :param MRN: integer of the query patient MRN
+
+    :returns: class of Patient, containing all the record
+    :returns: int of status_code
+    """
+    answer, status_code = retrieve_patient_driver(MRN)
     return jsonify(answer), status_code
 
 
