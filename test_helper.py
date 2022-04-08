@@ -97,3 +97,15 @@ def test_timestamp_format(timestamp, expected):
     from helper import timestamp_format
     answer = timestamp_format(timestamp)
     assert answer == expected
+
+
+@pytest.mark.parametrize("filename, expected", [
+    ['images/acl1.jpg', '/9j/4AAQSkZJRgABAgAA'],
+    ['images/acl2.jpg', '/9j/4AAQSkZJRgABAgAA'],
+    ['images/blank-avatar.jpg', 'iVBORw0KGgoAAAANSUhE'],
+    ['images/synpic50411.jpg', '/9j/4AAQSkZJRgABAgAA']
+])
+def test_image2b64(filename, expected):
+    from helper import image2b64
+    answer = image2b64(filename)
+    assert answer[:20] == expected

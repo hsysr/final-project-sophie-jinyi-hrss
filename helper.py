@@ -1,4 +1,5 @@
 from datetime import datetime
+import base64
 
 
 def type_check(value, types):
@@ -79,3 +80,19 @@ def timestamp_format(timestamp):
     """
     timestamp_string = datetime.strftime(timestamp, '%Y-%m-%d %H:%M:%S')
     return timestamp_string
+
+
+def image2b64(filename):
+    """Convert image to base64 string
+
+    This function tries to open an image file, and encode the image file into
+    a base 64 string.
+
+    :param filename: str containing the input filepath
+
+    :returns: string containing the encoded image as a base64 string
+    """
+    with open(filename, "rb") as image_file:
+        b64_bytes = base64.b64encode(image_file.read())
+    b64_string = str(b64_bytes, encoding='utf-8')
+    return b64_string
