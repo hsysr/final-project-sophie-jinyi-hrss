@@ -143,6 +143,21 @@ def patient_upload_driver(input_dict, timestamp):
     return "Added patient #" + str(result) + " to database", 200
 
 
+def retrieve_mrnlist_driver():
+    """Implements the /api/station/mrnlist route to upload patient
+    information to the database
+
+    This function implements the /api/station/mrnlist, it retrieves
+    patient MRNs existed in the databse
+
+    :returns: list of integers containing the MRN of all existed patients
+    """
+    mrnlist = []
+    for patient in Patient.objects.raw({}):
+        mrnlist.append(patient.MRN)
+    return mrnlist, 200
+
+
 @app.route("/", methods=["GET"])
 def status():
     """Server status route
@@ -157,7 +172,7 @@ def status():
     return "Server On"
 
 
-@app.route("/api/patient/upload", methods=["GET", "POST"])
+@app.route("/api/patient/upload", methods=["POST"])
 def patient_upload_handler():
     """Handles request to the /api/patient/upload route for uploading
     patient information
@@ -186,6 +201,27 @@ def patient_upload_handler():
         input_dict,
         timestamp_format(datetime.now())
     )
+    return jsonify(answer), status_code
+
+
+@app.route("/api/station/mrnlist", methods=["GET"])
+def retrieve_mrnlist_handler():
+    """Handles request to the /api/station/mrnlist route for retrieving
+    a list of MRN.
+
+    The /api/station/mrnlist  is a GET request that should return a
+    JSON-encoded list of MRN existed in the database
+
+    The function then calls a driver function that implements the functionality
+    of this route and receives an "answer" and "status_code" from this
+    driver function.  Finally, it returns the "answer" using jsonify and the
+    status_code.
+
+    :param: None
+
+    :returns: list of integers, containing list of existed patient MRN
+    """
+    answer, status_code = retrieve_mrnlist_driver()
     return jsonify(answer), status_code
 
 
