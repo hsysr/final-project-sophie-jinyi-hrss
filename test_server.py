@@ -180,9 +180,15 @@ def test_retrieve_patient_driver():
         ECG_timestamp=[])
     test_patient.save()
     answer, status_code = retrieve_patient_driver(2)
+    answer1, status_code1 = retrieve_patient_driver("2")
+    answer2, status_code2 = retrieve_patient_driver("8")
+    answer3, status_code3 = retrieve_patient_driver("5r")
     Patient.objects.raw({"_id": 2}).first().delete()
     assert answer == test_patient
     assert status_code == 200
-    answer2, status_code2 = retrieve_patient_driver(8)
+    assert answer1 == test_patient
+    assert status_code1 == 200
     assert answer2 == "Patient_id 8 was not found"
     assert status_code2 == 400
+    assert answer3 == "MRN is not a valid integer."
+    assert status_code3 == 400
