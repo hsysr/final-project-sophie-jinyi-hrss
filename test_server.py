@@ -157,3 +157,10 @@ def test_patient_upload_driver(input_dict, expt_ans, expt_code):
     assert status_code == expt_code
     if answer[:7] == "Updated":
         Patient.objects.raw({"_id": input_dict['MRN']}).first().delete()
+
+
+def test_retrieve_mrnlist_driver():
+    from server import retrieve_mrnlist_driver
+    answer, status_code = retrieve_mrnlist_driver()
+    assert answer == [5]
+    assert status_code == 200
