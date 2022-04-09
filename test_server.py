@@ -162,8 +162,31 @@ def test_patient_upload_driver(input_dict, expt_ans, expt_code):
 
 def test_retrieve_mrnlist_driver():
     from server import retrieve_mrnlist_driver
+    from database import Patient
+    from helper import file_to_b64_string
+    test_patient = Patient(
+        MRN=2,
+        name='Alex.M',
+        medical_image=[],
+        medical_timestamp=[],
+        heart_rate=[],
+        ECG_image=[],
+        ECG_timestamp=[])
+    test_patient.save()
+    test_patient2 = Patient(
+        MRN=5,
+        name='Alex.M',
+        medical_image=[file_to_b64_string('images/acl1.jpg'),
+                       file_to_b64_string('images/acl2.jpg')],
+        medical_timestamp=[],
+        heart_rate=[],
+        ECG_image=[],
+        ECG_timestamp=[])
+    test_patient2.save()
     answer, status_code = retrieve_mrnlist_driver()
-    assert answer == []
+    Patient.objects.raw({"_id": 2}).first().delete()
+    Patient.objects.raw({"_id": 5}).first().delete()
+    assert answer == [2, 5]
     assert status_code == 200
 
 
