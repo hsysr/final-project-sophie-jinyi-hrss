@@ -170,6 +170,7 @@ def test_retrieve_mrnlist_driver():
 def test_retrieve_patient_driver():
     from server import retrieve_patient_driver
     from database import Patient
+    from helper import file_to_b64_string
     test_patient = Patient(
         MRN=2,
         name='Alex.M',
@@ -179,11 +180,23 @@ def test_retrieve_patient_driver():
         ECG_image=[],
         ECG_timestamp=[])
     test_patient.save()
+    test_patient2 = Patient(
+        MRN=5,
+        name='Alex.M',
+        medical_image=[file_to_b64_string('images/acl1.jpg'),
+                       file_to_b64_string('images/acl2.jpg')],
+        medical_timestamp=[],
+        heart_rate=[],
+        ECG_image=[],
+        ECG_timestamp=[])
+    test_patient2.save()
     answer, status_code = retrieve_patient_driver(2)
     answer1, status_code1 = retrieve_patient_driver("2")
     answer2, status_code2 = retrieve_patient_driver("8")
     answer3, status_code3 = retrieve_patient_driver("5r")
+    answer4, status_code4 = retrieve_patient_driver("5")
     Patient.objects.raw({"_id": 2}).first().delete()
+    Patient.objects.raw({"_id": 5}).first().delete()
     assert answer == test_patient
     assert status_code == 200
     assert answer1 == test_patient
@@ -192,3 +205,5 @@ def test_retrieve_patient_driver():
     assert status_code2 == 400
     assert answer3 == "MRN is not a valid integer."
     assert status_code3 == 400
+    assert answer4 == test_patient2
+    assert status_code4 == 200
