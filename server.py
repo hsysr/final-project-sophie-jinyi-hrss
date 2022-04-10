@@ -171,7 +171,7 @@ def retrieve_patient_driver(MRN):
 
     :param MRN: integer of the query patient MRN
 
-    :returns: An instance of Patient class, containing all the record
+    :returns: dict of all the record of the patient
     :returns: int of status_code
     """
     from helper import num_parse
@@ -183,7 +183,15 @@ def retrieve_patient_driver(MRN):
             patient = Patient.objects.raw({"_id": MRN}).first()
         except pymodm_errors.DoesNotExist:
             return "Patient_id {} was not found".format(MRN), 400
-        return patient, 200
+        patient_record = {
+            "MRN": patient.MRN,
+            "name": patient.name,
+            "medical_image": patient.medical_image,
+            "medical_timestamp": patient.medical_timestamp,
+            "heart_rate": patient.heart_rate,
+            "ECG_image": patient.ECG_image,
+            "ECG_timestamp": patient.ECG_timestamp}
+        return patient_record, 200
 
 
 @app.route("/", methods=["GET"])
@@ -268,7 +276,7 @@ def retrieve_patient_handler(MRN):
 
     :param MRN: integer of the query patient MRN
 
-    :returns: class of Patient, containing all the record
+    :returns: dict of all the record of the patient
     :returns: int of status_code
     """
     answer, status_code = retrieve_patient_driver(MRN)

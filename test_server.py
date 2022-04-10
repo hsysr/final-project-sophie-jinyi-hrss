@@ -203,30 +203,46 @@ def test_retrieve_patient_driver():
         ECG_image=[],
         ECG_timestamp=[])
     test_patient.save()
+    patient_record = {
+            "MRN": 2,
+            "name": 'Alex.M',
+            "medical_image": [],
+            "medical_timestamp": [],
+            "heart_rate": [],
+            "ECG_image": [],
+            "ECG_timestamp": []}
     test_patient2 = Patient(
         MRN=5,
-        name='Alex.M',
+        name='Smith.F',
         medical_image=[file_to_b64_string('images/acl1.jpg'),
                        file_to_b64_string('images/acl2.jpg')],
-        medical_timestamp=[],
+        medical_timestamp=["2022-04-07 20:18:43",
+                           "2022-04-07 20:18:46"],
         heart_rate=[],
         ECG_image=[],
         ECG_timestamp=[])
     test_patient2.save()
-    answer, status_code = retrieve_patient_driver(2)
+    patient_record2 = {
+            "MRN": 5,
+            "name": 'Smith.F',
+            "medical_image": [file_to_b64_string('images/acl1.jpg'),
+                              file_to_b64_string('images/acl2.jpg')],
+            "medical_timestamp": ["2022-04-07 20:18:43",
+                                  "2022-04-07 20:18:46"],
+            "heart_rate": [],
+            "ECG_image": [],
+            "ECG_timestamp": []}
     answer1, status_code1 = retrieve_patient_driver("2")
     answer2, status_code2 = retrieve_patient_driver("8")
     answer3, status_code3 = retrieve_patient_driver("5r")
     answer4, status_code4 = retrieve_patient_driver("5")
     Patient.objects.raw({"_id": 2}).first().delete()
     Patient.objects.raw({"_id": 5}).first().delete()
-    assert answer == test_patient
-    assert status_code == 200
-    assert answer1 == test_patient
+    assert answer1 == patient_record
     assert status_code1 == 200
     assert answer2 == "Patient_id 8 was not found"
     assert status_code2 == 400
     assert answer3 == "MRN is not a valid integer."
     assert status_code3 == 400
-    assert answer4 == test_patient2
+    assert answer4 == patient_record2
     assert status_code4 == 200
