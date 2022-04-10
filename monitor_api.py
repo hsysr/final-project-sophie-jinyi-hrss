@@ -6,12 +6,17 @@ import json
 server = "http://127.0.0.1:5000"
 
 
-def retrieve_mrnlist_driver():
+def display_mrnlist_driver():
     """ Retrieve list of MRN
     When called in the handler, This function runs which
     retrieves up-to-date MRN list in the database.
     """
     r = requests.get(server + "/api/station/mrnlist")
-    mrnlist_int = json.loads(r.text)
-    mrnlist = list(map(str, mrnlist_int))
+    mrnlist = json.loads(r.text)
     return mrnlist
+
+
+def display_record_driver(MRN):
+    r = requests.get(server + "/api/station/" + MRN)
+    record = json.loads(r.text)
+    return record

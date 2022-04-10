@@ -14,4 +14,7 @@ print(a[0])
 
 r = requests.get(server + "/api/station/5")
 print(r.status_code)
-print(r.text)
+# print(r.text)
+b = json.loads(r.text)
+print(b["ECG_timestamp"][-1])
+print(type(b))
