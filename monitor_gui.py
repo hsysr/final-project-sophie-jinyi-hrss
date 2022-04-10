@@ -68,7 +68,7 @@ def main_window():
         mrnlist = api.display_mrnlist_driver()
         MRN_dropdown["values"] = mrnlist
 
-    def display_record_handler(event):
+    def update_record_handler(event):
         """ Handles display driver, store record and display the latest ECG
         When the user select a value under the dropdown box, this function
         would run and call te driver to get the
@@ -77,6 +77,8 @@ def main_window():
         """
         global record
         MRN = MRN_dropdown["values"][MRN_dropdown.current()]
+        if MRN is None:  # no MRN selected, no need to update record
+            return
         status_label.configure(text="Patient {} selected".format(MRN))
         record = api.display_record_driver(MRN)
         name_string.set(record["name"])
@@ -85,6 +87,7 @@ def main_window():
         latest_ECG_label.configure(image=tk_latest_ECG_image)
         latest_ECG_label.image = tk_latest_ECG_image
         date_latest_ECG_string.set(record["ECG_timestamp"][-1])
+        root.after(2000, update_record_handler)
 
     def format_image(base64_string):
         """ format the base64 image to ImageTk of size 150x150
@@ -113,7 +116,8 @@ def main_window():
 
     def display_selected_ECG_cmd(event):
         ECG_timestamp = ECG_dropdown["values"][ECG_dropdown.current()]
-        status_label.configure(text="ECG image at {} selected".format(ECG_timestamp))
+        status_label.configure(
+            text="ECG image at {} selected".format(ECG_timestamp))
         ECG_idx = record["ECG_timestamp"].index(ECG_timestamp)
         selected_heart_rate_string.set(record["heart_rate"][ECG_idx])
         tk_selected_ECG_image = format_image(record["ECG_image"][ECG_idx])
@@ -144,7 +148,7 @@ def main_window():
     MRN_dropdown.grid(column=1, row=0, padx=5, pady=5, sticky=tk.W)
     MRN_dropdown["values"] = ()
     MRN_dropdown.state(['readonly'])
-    MRN_dropdown.bind('<<ComboboxSelected>>', display_record_handler)
+    MRN_dropdown.bind('<<ComboboxSelected>>', update_record_handler)
 
     # Area1 latest ECG
     # Patient name
@@ -281,6 +285,7 @@ def main_window():
     ttk.Button(root, text="Cancel", command=cancel_cmd).grid(
         column=3, row=15, sticky=tk.W)
 
+    root.after(2000, update_record_handler)
     root.mainloop()
 
 
