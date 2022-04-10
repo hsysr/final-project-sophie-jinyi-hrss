@@ -46,6 +46,11 @@ def main_window():
         pass
 
     def retrieve_mrnlist_handler():
+        """ Handles Retrieving list of MRN upon click of "Select MRN image"
+        When the user clicks on the "Select MRN image" dropdown box, this
+        function is run which calls theretrieve_mrnlist_driver() to
+        retrieves up-to-date MRN list in thr database.
+        """
         mrnlist = api.retrieve_mrnlist_driver()
         MRN_dropdown["values"] = mrnlist
 
