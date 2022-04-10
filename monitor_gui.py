@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 from tkinter import filedialog
+import monitor_api as api
 
 
 def main_window():
@@ -44,7 +45,11 @@ def main_window():
         """
         pass
 
-    def retrieve_ECG_list():
+    def retrieve_mrnlist_handler():
+        mrnlist = api.retrieve_mrnlist_driver()
+        MRN_dropdown["values"] = mrnlist
+
+    def retrieve_ECG_list_handler():
         """ Retrieve list of ECG upon click of "Select ECG image" dropdown
         When the user clicks on the "Select ECG image" dropdown box, this
         function is run which retrieves up-to-date ECG image list of the
@@ -52,7 +57,7 @@ def main_window():
         """
         pass
 
-    def retrieve_med_list():
+    def retrieve_med_list_handler():
         """ Retrieve list of medical image upon click of "Select medical
         image" dropdown When the user clicks on the "Select ECG image"
         dropdown box, this function is run which retrieves up-to-date
@@ -70,7 +75,8 @@ def main_window():
         column=0, row=0, padx=5, pady=20, sticky=tk.W)
     MRN_entry = tk.StringVar()
     MRN_entry.set("Select patient MRN")
-    MRN_dropdown = ttk.Combobox(root, textvariable=MRN_entry)
+    MRN_dropdown = ttk.Combobox(root, textvariable=MRN_entry,
+                                postcommand=retrieve_mrnlist_handler)
     MRN_dropdown.grid(column=1, row=0, padx=5, pady=5, sticky=tk.W)
     MRN_dropdown["values"] = ("MRN1", "MRN2", "MRN3")  # would be replace
     MRN_dropdown.state(['readonly'])
@@ -123,7 +129,7 @@ def main_window():
     ECG_entry = tk.StringVar()
     ECG_entry.set("Select ECG image")
     ECG_dropdown = ttk.Combobox(
-        root, textvariable=ECG_entry, postcommand=retrieve_ECG_list)
+        root, textvariable=ECG_entry, postcommand=retrieve_ECG_list_handler)
     ECG_dropdown.grid(column=3, row=1, padx=5, pady=5, sticky=tk.W)
     ECG_dropdown["values"] = ("Image1", "Image2", "Image3")  # would be replace
     ECG_dropdown.state(['readonly'])
@@ -170,7 +176,7 @@ def main_window():
     med_entry = tk.StringVar()
     med_entry.set("Select medical image")
     med_dropdown = ttk.Combobox(
-        root, textvariable=med_entry, postcommand=retrieve_med_list)
+        root, textvariable=med_entry, postcommand=retrieve_med_list_handler)
     med_dropdown.grid(column=1, row=9, padx=5, pady=5, sticky=tk.W)
     med_dropdown["values"] = ("Image1", "Image2", "Image3")
     med_dropdown.state(['readonly'])
