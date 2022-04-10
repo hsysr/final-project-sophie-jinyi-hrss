@@ -9,6 +9,7 @@ import base64
 
 
 global record
+record = None
 
 
 def main_window():
@@ -31,22 +32,25 @@ def main_window():
         which clear all entry in the GUI window and change back to inital.
         """
         MRN_entry.set("Select patient MRN")
+        MRN_dropdown["values"] = ()
         name_string.set("None")
         latest_heart_rate_string.set("None")
         latest_ECG_label.configure(image=tk_blank_image_latest_ECG)
         latest_ECG_label.image = tk_blank_image_latest_ECG
         date_latest_ECG_string.set("None")
         ECG_entry.set("Select ECG image")
+        ECG_dropdown["values"] = ()
         selected_heart_rate_string.set("None")
         selected_ECG_label.configure(image=tk_blank_image_selected_ECG)
         selected_ECG_label.image = tk_blank_image_selected_ECG
         date_selected_ECG_string.set("None")
         med_entry.set("Select medical image")
+        med_dropdown["values"] = ()
         selected_medical_label.configure(image=tk_blank_image_selected_med)
         selected_medical_label.image = tk_blank_image_selected_med
         date_selected_med_string.set("None")
         status_label.configure(text="Status")
-        record = {}
+        record = None
 
     def download_cmd():
         """ Download images upon click of "Download" button
@@ -81,7 +85,6 @@ def main_window():
         latest_ECG_label.configure(image=tk_latest_ECG_image)
         latest_ECG_label.image = tk_latest_ECG_image
         date_latest_ECG_string.set(record["ECG_timestamp"][-1])
-        
 
     def format_image(base64_string):
         """ format the base64 image to ImageTk of size 150x150
@@ -91,18 +94,32 @@ def main_window():
         :param base64_string: base64 string of the input image
         :returns: ImageTk object
         """
-        imgdata=base64.b64decode(str(base64_string))
-        image=Image.open(io.BytesIO(imgdata)).resize((150, 150))
+        imgdata = base64.b64decode(str(base64_string))
+        image = Image.open(io.BytesIO(imgdata)).resize((150, 150))
         tk_image = ImageTk.PhotoImage(image)
         return tk_image
 
-    def retrieve_ECG_list_cmd():
+    def display_ECG_list_cmd():
         """ Retrieve list of ECG upon click of "Select ECG image" dropdown
         When the user clicks on the "Select ECG image" dropdown box, this
         function is run which retrieves up-to-date ECG image list of the
         selected patient.
         """
-        pass
+        global record
+        if record is None:
+            status_label.configure(text="Please select a patient MRN first")
+            return
+        ECG_dropdown["values"] = record["ECG_timestamp"]
+
+    def display_selected_ECG_cmd(event):
+        ECG_timestamp = ECG_dropdown["values"][ECG_dropdown.current()]
+        status_label.configure(text="ECG image at {} selected".format(ECG_timestamp))
+        ECG_idx = record["ECG_timestamp"].index(ECG_timestamp)
+        selected_heart_rate_string.set(record["heart_rate"][ECG_idx])
+        tk_selected_ECG_image = format_image(record["ECG_image"][ECG_idx])
+        selected_ECG_label.configure(image=tk_selected_ECG_image)
+        selected_ECG_label.image = tk_selected_ECG_image
+        date_selected_ECG_string.set(ECG_timestamp)
 
     def retrieve_med_list_handler():
         """ Retrieve list of medical image upon click of "Select medical
@@ -125,7 +142,7 @@ def main_window():
     MRN_dropdown = ttk.Combobox(root, textvariable=MRN_entry,
                                 postcommand=display_mrnlist_handler)
     MRN_dropdown.grid(column=1, row=0, padx=5, pady=5, sticky=tk.W)
-    MRN_dropdown["values"] = ("MRN1", "MRN2", "MRN3")
+    MRN_dropdown["values"] = ()
     MRN_dropdown.state(['readonly'])
     MRN_dropdown.bind('<<ComboboxSelected>>', display_record_handler)
 
@@ -151,7 +168,8 @@ def main_window():
     # Latest ECG image
     ttk.Label(root, text="Latest ECG image:").grid(
         column=0, row=3, padx=5, pady=5, sticky=tk.W)
-    blank_image_latest_ECG = Image.open("images/blank-avatar.jpg").resize((150, 150))
+    blank_image_latest_ECG = Image.open(
+        "images/blank-avatar.jpg").resize((150, 150))
     tk_blank_image_latest_ECG = ImageTk.PhotoImage(blank_image_latest_ECG)
     latest_ECG_label = ttk.Label(root, image=tk_blank_image_latest_ECG)
     latest_ECG_label.grid(
@@ -177,10 +195,11 @@ def main_window():
     ECG_entry = tk.StringVar()
     ECG_entry.set("Select ECG image")
     ECG_dropdown = ttk.Combobox(
-        root, textvariable=ECG_entry, postcommand=retrieve_ECG_list_cmd)
+        root, textvariable=ECG_entry, postcommand=display_ECG_list_cmd)
     ECG_dropdown.grid(column=3, row=1, padx=5, pady=5, sticky=tk.W)
-    ECG_dropdown["values"] = ("Image1", "Image2", "Image3")
+    ECG_dropdown["values"] = ()
     ECG_dropdown.state(['readonly'])
+    ECG_dropdown.bind('<<ComboboxSelected>>', display_selected_ECG_cmd)
 
     # Selected heart rate
     ttk.Label(root, text="Selected heart rate:").grid(
@@ -195,7 +214,8 @@ def main_window():
     # Display selected ECG image
     ttk.Label(root, text="Selected ECG image:").grid(
         column=2, row=3, padx=5, pady=5, sticky=tk.W)
-    blank_image_selected_ECG = Image.open("images/blank-avatar.jpg").resize((150, 150))
+    blank_image_selected_ECG = Image.open(
+        "images/blank-avatar.jpg").resize((150, 150))
     tk_blank_image_selected_ECG = ImageTk.PhotoImage(blank_image_selected_ECG)
     selected_ECG_label = ttk.Label(root, image=tk_blank_image_selected_ECG)
     selected_ECG_label.grid(
@@ -226,13 +246,14 @@ def main_window():
     med_dropdown = ttk.Combobox(
         root, textvariable=med_entry, postcommand=retrieve_med_list_handler)
     med_dropdown.grid(column=1, row=9, padx=5, pady=5, sticky=tk.W)
-    med_dropdown["values"] = ("Image1", "Image2", "Image3")
+    med_dropdown["values"] = ()
     med_dropdown.state(['readonly'])
 
     # Display medical image
     ttk.Label(root, text="Selected medical image:").grid(
         column=0, row=10, padx=5, pady=5, sticky=tk.W)
-    blank_image_selected_med = Image.open("images/blank-avatar.jpg").resize((150, 150))
+    blank_image_selected_med = Image.open(
+        "images/blank-avatar.jpg").resize((150, 150))
     tk_blank_image_selected_med = ImageTk.PhotoImage(blank_image_selected_med)
     selected_medical_label = ttk.Label(root, image=tk_blank_image_selected_med)
     selected_medical_label.grid(
