@@ -158,7 +158,7 @@ def retrieve_mrnlist_driver():
     return mrnlist, 200
 
 
-def retrieve_patient_driver(MRN):
+def retrieve_record_driver(MRN):
     """Implements the /api/station/<MRN> route for retrieving
     record of the patient according to given MRN.
 
@@ -262,7 +262,7 @@ def retrieve_mrnlist_handler():
 
 
 @app.route("/api/station/<MRN>", methods=["GET"])
-def retrieve_patient_handler(MRN):
+def retrieve_record_handler(MRN):
     """Handles request to the /api/station/<MRN> route for retrieving
     record of the patient according to given MRN.
 
@@ -279,7 +279,7 @@ def retrieve_patient_handler(MRN):
     :returns: dict of all the record of the patient
     :returns: int of status_code
     """
-    answer, status_code = retrieve_patient_driver(MRN)
+    answer, status_code = retrieve_record_driver(MRN)
     return jsonify(answer), status_code
 
 
