@@ -1,8 +1,17 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from helper import file_to_b64_string, num_parse
+from ecg_analysis import analyze_ecg
+import os
+from patient_api import upload_patient_driver
 
 from PIL import Image, ImageTk
+
+
+medical_image_base64 = ''
+ECG_image_base64 = ''
+heart_rate = -1
 
 
 def verify_GUI_inputs(input_id):
@@ -33,20 +42,69 @@ def main_window():
         When the user clicks on the "Clear" button, this function is run
         which clear all entry in the GUI window and change back to inital.
         """
-        pass
+        global medical_image_base64
+        global ECG_image_base64
+        global heart_rate
+        medical_image_base64 = ''
+        ECG_image_base64 = ''
+        heart_rate = -1
+        mrn_entry.set('')
+        name_entry.set('')
+        hr_label.configure(text="Heart Rate:")
+        status_label.configure(text="Please Enter Patient information")
+        blank_image = Image.open("images/blank-avatar.jpg").resize((350, 175))
+        tk_blank_image = ImageTk.PhotoImage(blank_image)
+        medical_image_label.configure(image=tk_blank_image)
+        medical_image_label.image = tk_blank_image
+        ECG_image_label.configure(image=tk_blank_image)
+        ECG_image_label.image = tk_blank_image
 
     def ok_cmd():
         """ This function runs when the user clicks on the "Ok" button. It gets
         the entered data from the interface and call other functions that
         upload the data to a server.
         """
-        pass
+        global medical_image_base64
+        global ECG_image_base64
+        global heart_rate
+        MRN = num_parse(mrn_entry.get())
+        if MRN is None:
+            status_label.configure(text="MRN must be a valid integer")
+            return
+        message = upload_patient_driver(MRN,
+                                        name_entry.get(),
+                                        medical_image_base64,
+                                        heart_rate,
+                                        ECG_image_base64)
+        status_label.configure(text=message)
 
     def medical_image_cmd():
-        pass
+        global medical_image_base64
+        filename = filedialog.askopenfilename(
+            filetypes=[('image', '.jpg .png')])
+        if filename == "":
+            return
+        new_medical_image = Image.open(filename).resize((350, 175))
+        new_tk_image = ImageTk.PhotoImage(new_medical_image)
+        medical_image_label.configure(image=new_tk_image)
+        medical_image_label.image = new_tk_image
+        medical_image_base64 = file_to_b64_string(filename)
 
     def ECG_data_cmd():
-        pass
+        global ECG_image_base64
+        global heart_rate
+        filename = filedialog.askopenfilename(
+            filetypes=[('ECG data', '.csv')])
+        if filename == "":
+            return
+        heart_rate, image_filename = analyze_ecg(filename)
+        new_ECG_image = Image.open(image_filename).resize((350, 175))
+        new_tk_image = ImageTk.PhotoImage(new_ECG_image)
+        ECG_image_label.configure(image=new_tk_image)
+        ECG_image_label.image = new_tk_image
+        ECG_image_base64 = file_to_b64_string(image_filename)
+        hr_label.configure(text="Heart Rate: " + str(heart_rate))
+        os.remove(image_filename)
 
     # Create root/base window
     root = tk.Tk()
@@ -55,14 +113,14 @@ def main_window():
 
     # Patient MRN Entry
     ttk.Label(root, text="MRN:").grid(column=0, row=1, padx=20, pady=20)
-    name_entry = tk.StringVar()
-    ttk.Entry(root, width=20, textvariable=name_entry).grid(column=1, row=1)
+    mrn_entry = tk.StringVar()
+    ttk.Entry(root, width=20, textvariable=mrn_entry).grid(column=1, row=1)
 
     # Patient Name Entry
     ttk.Label(root, text="Name:")\
        .grid(column=0, row=2, padx=20, pady=0, sticky='n')
-    id_entry = tk.StringVar()
-    ttk.Entry(root, width=20, textvariable=id_entry)\
+    name_entry = tk.StringVar()
+    ttk.Entry(root, width=20, textvariable=name_entry)\
        .grid(column=1, row=2, sticky='n')
 
     # Select Medical Image
