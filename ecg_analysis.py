@@ -295,5 +295,35 @@ def main():
     ouput_json(json_name, metrics)
 
 
+def analyze_ecg(filepath):
+    """Do ECG data analysis for patient-side client
+
+    Calculate heart rate and generate filered voltage plot for the
+    input data for patient-side client.
+
+    Args:
+        filepath (string): the filepath and name of the csv file
+
+    Returns:
+        int: average heart rate of ECG data
+        string: the filepath and name of the output voltage image
+    """
+    time, voltage = input_csv(filepath)
+    duration = get_duration(time)
+    voltage_filtered = butter_bandpass_filter(time, voltage)
+    beats = find_beats(time, voltage_filtered)
+    num_beats = get_num_beats(beats)
+    mean_hr_bpm = get_mean_hr_bpm(duration, num_beats)
+    plt.figure(figsize=(12, 6))
+    plt.plot(time, voltage_filtered)
+    plt.xlabel('time(s)')
+    plt.ylabel('voltage(mv)')
+    file = filepath.split('/')[-1].split('.')[0]
+    savepath = 'ecg_images/' + file + '.jpg'
+    plt.savefig(savepath)
+    plt.close()
+    return int(mean_hr_bpm), savepath
+
+
 if __name__ == "__main__":
     main()
