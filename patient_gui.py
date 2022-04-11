@@ -8,8 +8,8 @@ import os
 from PIL import Image, ImageTk
 
 
-medical_image_base64 = ""
-ECG_image_base64 = ""
+medical_image_base64 = ''
+ECG_image_base64 = ''
 heart_rate = -1
 
 
@@ -41,7 +41,22 @@ def main_window():
         When the user clicks on the "Clear" button, this function is run
         which clear all entry in the GUI window and change back to inital.
         """
-        pass
+        global medical_image_base64
+        global ECG_image_base64
+        global heart_rate
+        medical_image_base64 = ''
+        ECG_image_base64 = ''
+        heart_rate = -1
+        mrn_entry.set('')
+        name_entry.set('')
+        hr_label.configure(text="Heart Rate:")
+        status_label.configure(text="Please Enter Patient information")
+        blank_image = Image.open("images/blank-avatar.jpg").resize((350, 175))
+        tk_blank_image = ImageTk.PhotoImage(blank_image)
+        medical_image_label.configure(image=tk_blank_image)
+        medical_image_label.image = tk_blank_image
+        ECG_image_label.configure(image=tk_blank_image)
+        ECG_image_label.image = tk_blank_image
 
     def ok_cmd():
         """ This function runs when the user clicks on the "Ok" button. It gets
@@ -85,14 +100,14 @@ def main_window():
 
     # Patient MRN Entry
     ttk.Label(root, text="MRN:").grid(column=0, row=1, padx=20, pady=20)
-    name_entry = tk.StringVar()
-    ttk.Entry(root, width=20, textvariable=name_entry).grid(column=1, row=1)
+    mrn_entry = tk.StringVar()
+    ttk.Entry(root, width=20, textvariable=mrn_entry).grid(column=1, row=1)
 
     # Patient Name Entry
     ttk.Label(root, text="Name:")\
        .grid(column=0, row=2, padx=20, pady=0, sticky='n')
-    id_entry = tk.StringVar()
-    ttk.Entry(root, width=20, textvariable=id_entry)\
+    name_entry = tk.StringVar()
+    ttk.Entry(root, width=20, textvariable=name_entry)\
        .grid(column=1, row=2, sticky='n')
 
     # Select Medical Image
