@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-from helper import file_to_b64_string
+from helper import file_to_b64_string, num_parse
 from ecg_analysis import analyze_ecg
 import os
+from patient_api import upload_patient_driver
 
 from PIL import Image, ImageTk
 
@@ -63,7 +64,19 @@ def main_window():
         the entered data from the interface and call other functions that
         upload the data to a server.
         """
-        pass
+        global medical_image_base64
+        global ECG_image_base64
+        global heart_rate
+        MRN = num_parse(mrn_entry.get())
+        if MRN is None:
+            status_label.configure(text="MRN must be a valid integer")
+            return
+        message = upload_patient_driver(MRN,
+                                        name_entry.get(),
+                                        medical_image_base64,
+                                        heart_rate,
+                                        ECG_image_base64)
+        status_label.configure(text=message)
 
     def medical_image_cmd():
         global medical_image_base64
