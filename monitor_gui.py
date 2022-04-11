@@ -1,16 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter.filedialog import asksaveasfile
 from PIL import Image, ImageTk
-from tkinter import filedialog
 import monitor_api as api
 import helper
 import io
 import base64
 
 
-global record, MRN
+global record
 record = None
-MRN = None
 
 
 def main_window():
@@ -32,7 +31,7 @@ def main_window():
         When the user clicks on the "Clear" button, this function is run
         which clear all entry in the GUI window and change back to inital.
         """
-        global record, MRN
+        global record
         MRN_entry.set("Select patient MRN")
         MRN_dropdown["values"] = ()
         name_string.set("None")
@@ -52,15 +51,10 @@ def main_window():
         selected_medical_label.image = tk_blank_image_selected_med
         date_selected_medical_string.set("None")
         status_label.configure(text="Status")
-        MRN = None
+        MRN_dropdown.now = None
+        ECG_dropdown.idx = None
+        medical_dropdown.idx = None
         record = None
-
-    def download_cmd():
-        """ Download images upon click of "Download" button
-        When the user clicks on the "Download" button, this function is run
-        which download the corresponding image.
-        """
-        pass
 
     def display_mrnlist_handler():
         """ Handles Retrieving list of MRN upon click of "Select MRN image"
@@ -78,25 +72,27 @@ def main_window():
 
         :param event: event user slect a value under the combobox
         """
-        global record, MRN
-        MRN = MRN_dropdown["values"][MRN_dropdown.current()]
-        if MRN is None:  # no MRN selected, no need to update record
+        global record
+        # MRN = MRN_dropdown["values"][MRN_dropdown.current()]
+        MRN_dropdown.now = MRN_dropdown["values"][MRN_dropdown.current()]
+        if MRN_dropdown.now is None:  # no MRN selected, don't update
             return
-        status_label.configure(text="Patient {} selected".format(MRN))
+        status_label.configure(
+            text="Patient {} selected".format(MRN_dropdown.now))
         record = update_record_handler()
         name_string.set(record["name"])
         latest_heart_rate_string.set(record["heart_rate"][-1])
         tk_latest_ECG_image = format_image(record["ECG_image"][-1])
-        latest_ECG_label.configure(image=tk_latest_ECG_image)
         latest_ECG_label.image = tk_latest_ECG_image
+        latest_ECG_label.configure(image=tk_latest_ECG_image)
         date_latest_ECG_string.set(record["ECG_timestamp"][-1])
 
     def update_record_handler():
         # update automatically or update whil called
         root.after(2000, update_record_handler)
-        if MRN is None:
+        if MRN_dropdown.now is None:
             return
-        record = api.update_record_driver(MRN)
+        record = api.update_record_driver(MRN_dropdown.now)
         return record
 
     def format_image(base64_string):
@@ -111,6 +107,21 @@ def main_window():
         image = Image.open(io.BytesIO(imgdata)).resize((150, 150))
         tk_image = ImageTk.PhotoImage(image)
         return tk_image
+
+    def download_cmd(base64_string, filename):
+        """ Download latest_ECG images upon click of "Download" button
+        When the user clicks on the "Download" button, this function is run
+        which download the latest ECG image.
+        """
+        # base64_string = record["ECG_timestamp"][-1]
+        # filename = record["ECG_timestamp"][-1][:10] + "ECG.jpg"
+        # f = asksaveasfile(
+        #     initialfile=filename,
+        #     defaultextension=".jpg",
+        #     filetypes=[("All Files","*.*"),("Image Documents","*.jpg")])
+        helper.b64_string_to_file(base64_string, filename)
+        status_label.configure(
+            text="Image {} downloaded successfully".format(filename))
 
     def display_ECG_list_cmd():
         """ Retrieve list of ECG upon click of "Select ECG image" dropdown
@@ -136,9 +147,10 @@ def main_window():
         ECG_idx = record["ECG_timestamp"].index(ECG_timestamp)
         selected_heart_rate_string.set(record["heart_rate"][ECG_idx])
         tk_selected_ECG_image = format_image(record["ECG_image"][ECG_idx])
-        selected_ECG_label.configure(image=tk_selected_ECG_image)
         selected_ECG_label.image = tk_selected_ECG_image
+        selected_ECG_label.configure(image=tk_selected_ECG_image)
         date_selected_ECG_string.set(ECG_timestamp)
+        ECG_dropdown.idx = ECG_idx
 
     def display_medical_list_cmd():
         """ Retrieve list of medical image upon click of "Select medical
@@ -156,13 +168,14 @@ def main_window():
         medical_timestamp = \
             medical_dropdown["values"][medical_dropdown.current()]
         status_label.configure(
-            text="ECG image at {} selected".format(medical_timestamp))
+            text="Medical image at {} selected".format(medical_timestamp))
         medical_idx = record["medical_timestamp"].index(medical_timestamp)
         tk_selected_medical_image = format_image(
             record["medical_image"][medical_idx])
-        selected_medical_label.configure(image=tk_selected_medical_image)
         selected_medical_label.image = tk_selected_medical_image
+        selected_medical_label.configure(image=tk_selected_medical_image)
         date_selected_medical_string.set(medical_timestamp)
+        medical_dropdown.idx = medical_idx
 
     # Create root/base window
     root = tk.Tk()
@@ -177,6 +190,7 @@ def main_window():
     MRN_dropdown = ttk.Combobox(root, textvariable=MRN_entry,
                                 postcommand=display_mrnlist_handler)
     MRN_dropdown.grid(column=1, row=0, padx=5, pady=5, sticky=tk.W)
+    MRN_dropdown.now = None
     MRN_dropdown["values"] = ()
     MRN_dropdown.state(['readonly'])
     MRN_dropdown.bind('<<ComboboxSelected>>', display_record_cmd)
@@ -220,8 +234,11 @@ def main_window():
         column=1, row=6, padx=5, pady=5, sticky=tk.W)
 
     # download ECG image
-    ttk.Button(root, text="Download", command=download_cmd).grid(
-        column=0, row=7, padx=5, pady=5, sticky=tk.W)
+    ttk.Button(
+        root, text="Download",
+        command=lambda: download_cmd(
+            record["ECG_image"][-1], record["ECG_timestamp"][-1][:10] +
+            "ECG.jpg")).grid(column=0, row=7, padx=5, pady=5, sticky=tk.W)
 
     # Area2 historical ECG
     # Select historical ECG
@@ -263,8 +280,11 @@ def main_window():
     ttk.Label(root, textvariable=date_selected_ECG_string).grid(
         column=3, row=6, padx=5, pady=5, sticky=tk.W)
 
-    # download ECG emage
-    ttk.Button(root, text="Download", command=download_cmd).grid(
+    # download ECG image
+    ttk.Button(root, text="Download", command=lambda: download_cmd(
+            record["ECG_image"][ECG_dropdown.idx],
+            record["ECG_timestamp"][ECG_dropdown.idx][:10] +
+            "ECG.jpg")).grid(
         column=2, row=7, padx=5, pady=5, sticky=tk.W)
 
     # blank line
@@ -303,8 +323,11 @@ def main_window():
         column=1, row=13, padx=5, pady=5, sticky=tk.W)
 
     # download medical emage
-    ttk.Button(root, text="Download", command=download_cmd).grid(
-        column=0, row=14, padx=5, pady=5, sticky=tk.W)
+    ttk.Button(
+        root, text="Download", command=lambda: download_cmd(
+            record["medical_image"][medical_dropdown.idx],
+            record["medical_timestamp"][medical_dropdown.idx][:10] +
+            "medical.jpg")).grid(column=0, row=14, padx=5, pady=5, sticky=tk.W)
 
     # Status indicator
     status_label = ttk.Label(root, text="Status")
