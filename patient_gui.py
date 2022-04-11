@@ -48,7 +48,8 @@ def main_window():
 
     def medical_image_cmd():
         global medical_image_base64
-        filename = filedialog.askopenfilename()
+        filename = filedialog.askopenfilename(
+            filetypes=[('image', '.jpg .png')])
         if filename == "":
             return
         new_medical_image = Image.open(filename).resize((350, 175))
