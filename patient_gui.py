@@ -2,11 +2,15 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 from helper import file_to_b64_string
+from ecg_analysis import analyze_ecg
+import os
 
 from PIL import Image, ImageTk
 
 
 medical_image_base64 = ""
+ECG_image_base64 = ""
+heart_rate = -1
 
 
 def verify_GUI_inputs(input_id):
@@ -59,7 +63,20 @@ def main_window():
         medical_image_base64 = file_to_b64_string(filename)
 
     def ECG_data_cmd():
-        pass
+        global ECG_image_base64
+        global heart_rate
+        filename = filedialog.askopenfilename(
+            filetypes=[('ECG data', '.csv')])
+        if filename == "":
+            return
+        heart_rate, image_filename = analyze_ecg(filename)
+        new_ECG_image = Image.open(image_filename).resize((350, 175))
+        new_tk_image = ImageTk.PhotoImage(new_ECG_image)
+        ECG_image_label.configure(image=new_tk_image)
+        ECG_image_label.image = new_tk_image
+        ECG_image_base64 = file_to_b64_string(image_filename)
+        hr_label.configure(text="Heart Rate: " + str(heart_rate))
+        os.remove(image_filename)
 
     # Create root/base window
     root = tk.Tk()
