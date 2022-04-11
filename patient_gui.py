@@ -161,4 +161,6 @@ def main_window():
 
 
 if __name__ == '__main__':
+    if not os.path.exists("ecg_images/"):
+        os.makedirs("ecg_images/")
     main_window()
