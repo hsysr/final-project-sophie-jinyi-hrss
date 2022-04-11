@@ -6,3 +6,8 @@ flask
 pillow
 pymodm
 dnspython
+pandas
+matplotlib
+scipy
+numpy
+loggings
