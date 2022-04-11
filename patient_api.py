@@ -31,3 +31,21 @@ def setup_patient_data(MRN, name, medical_image, heart_rate, ECG_image):
     patient_data['heart_rate'] = heart_rate
     patient_data['ECG_image'] = ECG_image
     return patient_data
+
+
+def respond_request(answer, status):
+    """handle the server's respond of upload request
+
+    This function takes the reponse and status code from the
+    server responding to the upload POST request. It returns
+    message to show on patient-side GUI
+
+    :param answer: str containing server's response text
+    :param status: int containing the server's responding status code
+
+    :returns: str containing the message to show on GUI
+    """
+    if status == 200:
+        return 'Successfully upload patient data'
+    else:
+        return answer

@@ -1,5 +1,4 @@
 import pytest
-from helper import file_to_b64_string
 
 
 @pytest.mark.parametrize(
@@ -58,4 +57,21 @@ def test_setup_patient_data(MRN,
                                 medical_image,
                                 heart_rate,
                                 ECG_image)
+    assert answer == expected
+
+
+@pytest.mark.parametrize("answer, status, expected", [
+    ["Added patient #114535 to database",
+     200,
+     "Successfully upload patient data"],
+    ["Updated information of patient #114535",
+     200,
+     "Successfully upload patient data"],
+    ["The input is not a dictionary with correct format",
+     400,
+     "The input is not a dictionary with correct format"]
+])
+def test_respond_request(answer, status, expected):
+    from patient_api import respond_request
+    answer = respond_request(answer, status)
     assert answer == expected
