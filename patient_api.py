@@ -49,3 +49,22 @@ def respond_request(answer, status):
         return 'Successfully upload patient data'
     else:
         return answer
+
+
+def upload_patient_request(patient_data):
+    """Make POST request to upload patient information to
+    server
+
+    This function takes the patient data as dictionary and
+    makes a POST request to the server to upload the patient
+    data
+
+    :param patient_data: dictionary containing the patient's
+                         data for uploading
+
+    :returns: str containing server's response text
+    :returns: int containing the server's responding status code
+    """
+    global server
+    r = requests.post(server + "/api/patient/upload", json=patient_data)
+    return r.text, r.status_code
