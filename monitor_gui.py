@@ -66,34 +66,37 @@ def main_window():
         MRN_dropdown["values"] = mrnlist
 
     def display_record_cmd(event):
-        """ Handles display driver, store record and display the latest ECG
+        """ Get record of the selected MRN and display latest ECG
         When the user select a value under the dropdown box, this function
-        would run and call te driver to get the
+        would run store the MRN value under MRN_dropdown.now, and
+        will call update_record_handler to update the display of the latest
+        ECG image.
 
-        :param event: event user slect a value under the combobox
+        :param event: event user select a value under the combobox
+        """
+        MRN_dropdown.now = MRN_dropdown["values"][MRN_dropdown.current()]
+        update_record_handler()
+
+    def update_record_handler():
+        """ Handles update_record driver, store record and display the
+        latest ECG When the user select a value under the dropdown box,
+        this function would run and call te driver to update the record.
+        THis function would also run every 2000msec, to automatically
+        update the record.
         """
         global record
-        # MRN = MRN_dropdown["values"][MRN_dropdown.current()]
-        MRN_dropdown.now = MRN_dropdown["values"][MRN_dropdown.current()]
         if MRN_dropdown.now is None:  # no MRN selected, don't update
             return
         status_label.configure(
             text="Patient {} selected".format(MRN_dropdown.now))
-        record = update_record_handler()
+        record = api.update_record_driver(MRN_dropdown.now)
         name_string.set(record["name"])
         latest_heart_rate_string.set(record["heart_rate"][-1])
         tk_latest_ECG_image = format_image(record["ECG_image"][-1])
         latest_ECG_label.image = tk_latest_ECG_image
         latest_ECG_label.configure(image=tk_latest_ECG_image)
         date_latest_ECG_string.set(record["ECG_timestamp"][-1])
-
-    def update_record_handler():
-        # update automatically or update whil called
         root.after(2000, update_record_handler)
-        if MRN_dropdown.now is None:
-            return
-        record = api.update_record_driver(MRN_dropdown.now)
-        return record
 
     def format_image(base64_string):
         """ format the base64 image to ImageTk of size 150x150
@@ -109,9 +112,13 @@ def main_window():
         return tk_image
 
     def download_cmd(base64_string, filename):
-        """ Download latest_ECG images upon click of "Download" button
-        When the user clicks on the "Download" button, this function is run
-        which download the latest ECG image.
+        """ Download images upon click of "Download" button
+        When the user clicks on the "Download" button, this function would
+        download the image represented by base64_string.
+
+        :param base64_string: base64 string of the input image
+        :param filename: filename of the downloaded image
+        :returns: None
         """
         # base64_string = record["ECG_timestamp"][-1]
         # filename = record["ECG_timestamp"][-1][:10] + "ECG.jpg"
@@ -136,7 +143,7 @@ def main_window():
         ECG_dropdown["values"] = record["ECG_timestamp"]
 
     def display_selected_ECG_cmd(event):
-        """ Retrieve list of ECG upon selection of ECG_dropdown
+        """ Retrieve corresponding ECG_image upon selection of ECG_dropdown
         When the user clicks on the value under ECG_dropdown box, this
         function is run which displays the selected ECG image of the
         selected patient.
@@ -165,6 +172,11 @@ def main_window():
         medical_dropdown["values"] = record["medical_timestamp"]
 
     def display_selected_medical_cmd(event):
+        """ Retrieve corresponding medical_image upon selection of ECG_dropdown
+        When the user clicks on the value under ECG_dropdown box, this
+        function is run which displays the selected ECG image of the
+        selected patient.
+        """
         medical_timestamp = \
             medical_dropdown["values"][medical_dropdown.current()]
         status_label.configure(
