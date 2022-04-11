@@ -52,8 +52,8 @@ def respond_request(answer, status):
 
 
 def upload_patient_request(patient_data):
-    """Make POST request to upload patient information to
-    server
+    """Make POST request to /api/patient/upload server route to
+    upload patient information
 
     This function takes the patient data as dictionary and
     makes a POST request to the server to upload the patient
@@ -68,3 +68,32 @@ def upload_patient_request(patient_data):
     global server
     r = requests.post(server + "/api/patient/upload", json=patient_data)
     return r.text, r.status_code
+
+
+def upload_patient_driver(MRN, name, medical_image, heart_rate, ECG_image):
+    """Implements the POST request to server route /api/patient/upload
+
+    This function implements POST request sending to server route
+    /api/patient/upload. This function takes the attributes
+    of a patient's record, and calls other functions to setup data,
+    make POST request and handle server response.
+
+    :param MRN: int containing the patient's medical record number
+    :param name: str containing the patient's name
+    :param medical_image: str containing the patient's medical image
+                          as base64 string
+    :param heart_rate: int containing the patient's average heart
+                       rate per minute
+    :param ECG_image: str containing the patient's ECG image
+                      as base64 string
+
+    :returns: str containing the message to show on GUI
+    """
+    patient_data = setup_patient_data(MRN,
+                                      name,
+                                      medical_image,
+                                      heart_rate,
+                                      ECG_image)
+    answer, status = upload_patient_request(patient_data)
+    message = respond_request(answer, status)
+    return message
