@@ -8,8 +8,9 @@ import io
 import base64
 
 
-global record
+global record, MRN
 record = None
+MRN = None
 
 
 def main_window():
@@ -31,6 +32,7 @@ def main_window():
         When the user clicks on the "Clear" button, this function is run
         which clear all entry in the GUI window and change back to inital.
         """
+        global record, MRN
         MRN_entry.set("Select patient MRN")
         MRN_dropdown["values"] = ()
         name_string.set("None")
@@ -50,6 +52,7 @@ def main_window():
         selected_medical_label.image = tk_blank_image_selected_med
         date_selected_med_string.set("None")
         status_label.configure(text="Status")
+        MRN = None
         record = None
 
     def download_cmd():
@@ -68,26 +71,33 @@ def main_window():
         mrnlist = api.display_mrnlist_driver()
         MRN_dropdown["values"] = mrnlist
 
-    def update_record_handler(event):
+    def display_record_cmd(event):
         """ Handles display driver, store record and display the latest ECG
         When the user select a value under the dropdown box, this function
         would run and call te driver to get the
 
         :param event: event user slect a value under the combobox
         """
-        global record
+        global record, MRN
         MRN = MRN_dropdown["values"][MRN_dropdown.current()]
         if MRN is None:  # no MRN selected, no need to update record
             return
         status_label.configure(text="Patient {} selected".format(MRN))
-        record = api.display_record_driver(MRN)
+        record = update_record_handler()
         name_string.set(record["name"])
         latest_heart_rate_string.set(record["heart_rate"][-1])
         tk_latest_ECG_image = format_image(record["ECG_image"][-1])
         latest_ECG_label.configure(image=tk_latest_ECG_image)
         latest_ECG_label.image = tk_latest_ECG_image
         date_latest_ECG_string.set(record["ECG_timestamp"][-1])
+
+    def update_record_handler():
+        # update automatically or update whil called
         root.after(2000, update_record_handler)
+        if MRN is None:
+            return
+        record = api.update_record_driver(MRN)
+        return record
 
     def format_image(base64_string):
         """ format the base64 image to ImageTk of size 150x150
@@ -115,6 +125,11 @@ def main_window():
         ECG_dropdown["values"] = record["ECG_timestamp"]
 
     def display_selected_ECG_cmd(event):
+        """ Retrieve list of ECG upon selection of ECG_dropdown
+        When the user clicks on the value under ECG_dropdown box, this
+        function is run which displays the selected ECG image of the
+        selected patient.
+        """
         ECG_timestamp = ECG_dropdown["values"][ECG_dropdown.current()]
         status_label.configure(
             text="ECG image at {} selected".format(ECG_timestamp))
@@ -124,6 +139,28 @@ def main_window():
         selected_ECG_label.configure(image=tk_selected_ECG_image)
         selected_ECG_label.image = tk_selected_ECG_image
         date_selected_ECG_string.set(ECG_timestamp)
+
+    def display_med_list_cmd():
+        """ Retrieve list of ECG upon click of "Select ECG image" dropdown
+        When the user clicks on the "Select ECG image" dropdown box, this
+        function is run which retrieves up-to-date ECG image list of the
+        selected patient.
+        """
+        global record
+        if record is None:
+            status_label.configure(text="Please select a patient MRN first")
+            return
+        med_dropdown["values"] = record["medical_timestamp"]
+
+    def display_selected_med_cmd(event):
+        medical_timestamp = ECG_dropdown["values"][med_dropdown.current()]
+        status_label.configure(
+            text="ECG image at {} selected".format(medical_timestamp))
+        medical_idx = record["medical_timestamp"].index(medical_timestamp)
+        tk_selected_medical_image = format_image(record["ECG_image"][medical_idx])
+        selected_medical_label.configure(image=tk_selected_medical_image)
+        selected_medical_label.image = tk_selected_medical_image
+        date_selected_ECG_string.set(medical_timestamp)
 
     def retrieve_med_list_handler():
         """ Retrieve list of medical image upon click of "Select medical
@@ -148,7 +185,7 @@ def main_window():
     MRN_dropdown.grid(column=1, row=0, padx=5, pady=5, sticky=tk.W)
     MRN_dropdown["values"] = ()
     MRN_dropdown.state(['readonly'])
-    MRN_dropdown.bind('<<ComboboxSelected>>', update_record_handler)
+    MRN_dropdown.bind('<<ComboboxSelected>>', display_record_cmd)
 
     # Area1 latest ECG
     # Patient name

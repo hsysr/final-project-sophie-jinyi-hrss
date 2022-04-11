@@ -16,7 +16,7 @@ def display_mrnlist_driver():
     return mrnlist
 
 
-def display_record_driver(MRN):
+def update_record_driver(MRN):
     r = requests.get(server + "/api/station/" + MRN)
     record = json.loads(r.text)
     return record
