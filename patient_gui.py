@@ -1,8 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from helper import file_to_b64_string
 
 from PIL import Image, ImageTk
+
+
+medical_image_base64 = ""
 
 
 def verify_GUI_inputs(input_id):
@@ -43,7 +47,15 @@ def main_window():
         pass
 
     def medical_image_cmd():
-        pass
+        global medical_image_base64
+        filename = filedialog.askopenfilename()
+        if filename == "":
+            return
+        new_medical_image = Image.open(filename).resize((350, 175))
+        new_tk_image = ImageTk.PhotoImage(new_medical_image)
+        medical_image_label.configure(image=new_tk_image)
+        medical_image_label.image = new_tk_image
+        medical_image_base64 = file_to_b64_string(filename)
 
     def ECG_data_cmd():
         pass
