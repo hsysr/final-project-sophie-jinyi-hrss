@@ -17,6 +17,10 @@ def display_mrnlist_driver():
 
 
 def update_record_driver(MRN):
+    """ Retrieve record of the selected patient
+    When called in the handler, This function runs which
+    retrieves patient record according to the MRN
+    """
     r = requests.get(server + "/api/station/" + MRN)
     record = json.loads(r.text)
     return record

@@ -46,11 +46,11 @@ def main_window():
         selected_ECG_label.configure(image=tk_blank_image_selected_ECG)
         selected_ECG_label.image = tk_blank_image_selected_ECG
         date_selected_ECG_string.set("None")
-        med_entry.set("Select medical image")
-        med_dropdown["values"] = ()
+        medical_entry.set("Select medical image")
+        medical_dropdown["values"] = ()
         selected_medical_label.configure(image=tk_blank_image_selected_med)
         selected_medical_label.image = tk_blank_image_selected_med
-        date_selected_med_string.set("None")
+        date_selected_medical_string.set("None")
         status_label.configure(text="Status")
         MRN = None
         record = None
@@ -140,35 +140,29 @@ def main_window():
         selected_ECG_label.image = tk_selected_ECG_image
         date_selected_ECG_string.set(ECG_timestamp)
 
-    def display_med_list_cmd():
-        """ Retrieve list of ECG upon click of "Select ECG image" dropdown
-        When the user clicks on the "Select ECG image" dropdown box, this
-        function is run which retrieves up-to-date ECG image list of the
-        selected patient.
-        """
-        global record
-        if record is None:
-            status_label.configure(text="Please select a patient MRN first")
-            return
-        med_dropdown["values"] = record["medical_timestamp"]
-
-    def display_selected_med_cmd(event):
-        medical_timestamp = ECG_dropdown["values"][med_dropdown.current()]
-        status_label.configure(
-            text="ECG image at {} selected".format(medical_timestamp))
-        medical_idx = record["medical_timestamp"].index(medical_timestamp)
-        tk_selected_medical_image = format_image(record["ECG_image"][medical_idx])
-        selected_medical_label.configure(image=tk_selected_medical_image)
-        selected_medical_label.image = tk_selected_medical_image
-        date_selected_ECG_string.set(medical_timestamp)
-
-    def retrieve_med_list_handler():
+    def display_medical_list_cmd():
         """ Retrieve list of medical image upon click of "Select medical
         image" dropdown When the user clicks on the "Select ECG image"
         dropdown box, this function is run which retrieves up-to-date
         medical image list of the selected patient.
         """
-        pass
+        global record
+        if record is None:
+            status_label.configure(text="Please select a patient MRN first")
+            return
+        medical_dropdown["values"] = record["medical_timestamp"]
+
+    def display_selected_medical_cmd(event):
+        medical_timestamp = \
+            medical_dropdown["values"][medical_dropdown.current()]
+        status_label.configure(
+            text="ECG image at {} selected".format(medical_timestamp))
+        medical_idx = record["medical_timestamp"].index(medical_timestamp)
+        tk_selected_medical_image = format_image(
+            record["medical_image"][medical_idx])
+        selected_medical_label.configure(image=tk_selected_medical_image)
+        selected_medical_label.image = tk_selected_medical_image
+        date_selected_medical_string.set(medical_timestamp)
 
     # Create root/base window
     root = tk.Tk()
@@ -248,7 +242,6 @@ def main_window():
     # Display Selected heart rate
     selected_heart_rate_string = tk.StringVar()
     selected_heart_rate_string.set("None")
-    # Will be replaced by Latest heart rate of the selected patient
     ttk.Label(root, textvariable=selected_heart_rate_string).grid(
         column=3, row=2, padx=5, pady=5, sticky=tk.W)
 
@@ -282,13 +275,14 @@ def main_window():
     # Select historical medical image name
     ttk.Label(root, text="Medical image:").grid(
         column=0, row=9, padx=5, pady=5, sticky=tk.W)
-    med_entry = tk.StringVar()
-    med_entry.set("Select medical image")
-    med_dropdown = ttk.Combobox(
-        root, textvariable=med_entry, postcommand=retrieve_med_list_handler)
-    med_dropdown.grid(column=1, row=9, padx=5, pady=5, sticky=tk.W)
-    med_dropdown["values"] = ()
-    med_dropdown.state(['readonly'])
+    medical_entry = tk.StringVar()
+    medical_entry.set("Select medical image")
+    medical_dropdown = ttk.Combobox(
+        root, textvariable=medical_entry, postcommand=display_medical_list_cmd)
+    medical_dropdown.grid(column=1, row=9, padx=5, pady=5, sticky=tk.W)
+    medical_dropdown["values"] = ()
+    medical_dropdown.state(['readonly'])
+    medical_dropdown.bind('<<ComboboxSelected>>', display_selected_medical_cmd)
 
     # Display medical image
     ttk.Label(root, text="Selected medical image:").grid(
@@ -303,18 +297,18 @@ def main_window():
     # Selected medical image datatime
     ttk.Label(root, text="Date of selected medical image:").grid(
         column=0, row=13, padx=5, pady=5, sticky=tk.W)
-    date_selected_med_string = tk.StringVar()
-    date_selected_med_string.set("None")
-    ttk.Label(root, textvariable=date_selected_med_string).grid(
+    date_selected_medical_string = tk.StringVar()
+    date_selected_medical_string.set("None")
+    ttk.Label(root, textvariable=date_selected_medical_string).grid(
         column=1, row=13, padx=5, pady=5, sticky=tk.W)
 
-    # download ECG emage
+    # download medical emage
     ttk.Button(root, text="Download", command=download_cmd).grid(
         column=0, row=14, padx=5, pady=5, sticky=tk.W)
 
     # Status indicator
     status_label = ttk.Label(root, text="Status")
-    status_label.grid(column=2, row=13, sticky=tk.W)
+    status_label.grid(column=2, row=13, columnspan=2, sticky=tk.W)
 
     # main buttons
     ttk.Button(root, text="Clear", command=clear_cmd).grid(
