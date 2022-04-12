@@ -34,9 +34,9 @@ def main_window():
         global record
         MRN_entry.set("Select patient MRN")
         MRN_dropdown["values"] = ()
-        reset_patient()
+        reset_record()
 
-    def reset_patient():
+    def reset_record():
         """ Clear all entry except for MRN_dropdown
         Clear all entry except for MRN_dropdown when select a new MRN
         """
@@ -81,8 +81,10 @@ def main_window():
 
         :param event: event user select a value under the combobox
         """
-        reset_patient()
+        reset_record()
         MRN_dropdown.now = MRN_dropdown["values"][MRN_dropdown.current()]
+        status_label.configure(
+            text="Patient {} selected".format(MRN_dropdown.now))
         update_record_handler()
 
     def update_record_handler():
@@ -93,10 +95,6 @@ def main_window():
         update the record.
         """
         global record
-        if MRN_dropdown.now is None:  # no MRN selected, don't update
-            return
-        status_label.configure(
-            text="Patient {} selected".format(MRN_dropdown.now))
         record = api.update_record_driver(MRN_dropdown.now)
         name_string.set(record["name"])
         latest_heart_rate_string.set(record["heart_rate"][-1])
@@ -136,7 +134,7 @@ def main_window():
         #     filetypes=[("All Files","*.*"),("Image Documents","*.jpg")])
         helper.b64_string_to_file(base64_string, filename)
         status_label.configure(
-            text="Image {} downloaded successfully".format(filename))
+            text="{} downloaded successfully".format(filename))
 
     def display_ECG_list_cmd():
         """ Retrieve list of ECG upon click of "Select ECG image" dropdown
