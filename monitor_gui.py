@@ -95,6 +95,8 @@ def main_window():
         update the record.
         """
         global record
+        if MRN_dropdown.now is None:
+            return
         record = api.update_record_driver(MRN_dropdown.now)
         name_string.set(record["name"])
         latest_heart_rate_string.set(record["heart_rate"][-1])
@@ -117,7 +119,7 @@ def main_window():
         tk_image = ImageTk.PhotoImage(image)
         return tk_image
 
-    def download_cmd(base64_string, filename):
+    def download_cmd(base64_string, timestamp, image_type):
         """ Download images upon click of "Download" button
         When the user clicks on the "Download" button, this function would
         download the image represented by base64_string.
@@ -126,13 +128,12 @@ def main_window():
         :param filename: filename of the downloaded image
         :returns: None
         """
-        # base64_string = record["ECG_timestamp"][-1]
-        # filename = record["ECG_timestamp"][-1][:10] + "ECG.jpg"
-        # f = asksaveasfile(
+        filename = api.generate_filename(timestamp, image_type)
+        helper.b64_string_to_file(base64_string, filename)
+        # f = asksaveasfilename(
         #     initialfile=filename,
         #     defaultextension=".jpg",
         #     filetypes=[("All Files","*.*"),("Image Documents","*.jpg")])
-        helper.b64_string_to_file(base64_string, filename)
         status_label.configure(
             text="{} downloaded successfully".format(filename))
 
@@ -256,8 +257,8 @@ def main_window():
     ttk.Button(
         root, text="Download",
         command=lambda: download_cmd(
-            record["ECG_image"][-1], record["ECG_timestamp"][-1][:10] +
-            "ECG.jpg")).grid(column=0, row=7, padx=5, pady=5, sticky=tk.W)
+            record["ECG_image"][-1], record["ECG_timestamp"][-1], "ECG")).grid(
+        column=0, row=7, padx=5, pady=5, sticky=tk.W)
 
     # Area2 historical ECG
     # Select historical ECG
@@ -291,7 +292,7 @@ def main_window():
     selected_ECG_label.grid(
         column=2, row=4, padx=5, pady=5, rowspan=2, columnspan=2, sticky=tk.W)
 
-    # Selected ECG image datatime
+    # Selected ECG image datetime
     ttk.Label(root, text="Date of selected ECG image:").grid(
         column=2, row=6, padx=5, pady=5, sticky=tk.W)
     date_selected_ECG_string = tk.StringVar()
@@ -302,8 +303,7 @@ def main_window():
     # download ECG image
     ttk.Button(root, text="Download", command=lambda: download_cmd(
             record["ECG_image"][ECG_dropdown.idx],
-            record["ECG_timestamp"][ECG_dropdown.idx][:10] +
-            "ECG.jpg")).grid(
+            record["ECG_timestamp"][ECG_dropdown.idx], "ECG")).grid(
         column=2, row=7, padx=5, pady=5, sticky=tk.W)
 
     # blank line
@@ -345,8 +345,8 @@ def main_window():
     ttk.Button(
         root, text="Download", command=lambda: download_cmd(
             record["medical_image"][medical_dropdown.idx],
-            record["medical_timestamp"][medical_dropdown.idx][:10] +
-            "medical.jpg")).grid(column=0, row=14, padx=5, pady=5, sticky=tk.W)
+            record["medical_timestamp"][medical_dropdown.idx], "medical"))\
+        .grid(column=0, row=14, padx=5, pady=5, sticky=tk.W)
 
     # Status indicator
     status_label = ttk.Label(root, text="Status")
