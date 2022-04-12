@@ -98,12 +98,14 @@ def main_window():
         if MRN_dropdown.now is None:
             return
         record = api.update_record_driver(MRN_dropdown.now)
-        name_string.set(record["name"])
-        latest_heart_rate_string.set(record["heart_rate"][-1])
-        tk_latest_ECG_image = format_image(record["ECG_image"][-1])
-        latest_ECG_label.image = tk_latest_ECG_image
-        latest_ECG_label.configure(image=tk_latest_ECG_image)
-        date_latest_ECG_string.set(record["ECG_timestamp"][-1])
+        if len(record["name"]) != 0:
+            name_string.set(record["name"])
+        if len(record["heart_rate"]) != 0:
+            latest_heart_rate_string.set(record["heart_rate"][-1])
+            tk_latest_ECG_image = format_image(record["ECG_image"][-1])
+            latest_ECG_label.image = tk_latest_ECG_image
+            latest_ECG_label.configure(image=tk_latest_ECG_image)
+            date_latest_ECG_string.set(record["ECG_timestamp"][-1])
         root.after(2000, update_record_handler)
 
     def format_image(base64_string):
