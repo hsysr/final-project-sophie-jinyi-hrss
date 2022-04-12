@@ -24,6 +24,33 @@ def init_server():
             "myFirstDatabase?retryWrites=true&w=majority")
 
 
+def append_patient_info(patient, input_dict, timestamp):
+    """Update patient name, new medical image and ECG
+    data of the patient document
+
+    This function update the name of the patient, append
+    the new medical image, ECG image and heartrate to
+    the patient's document if such data are presented.
+    It also append the timestamp when the data is
+    received by the server.
+
+    :param input_dict: dictionary containing the new patient's
+                       information
+    :param timestamp: str containing the time when the patient
+                      is post to the server
+
+    :returns: None
+    """
+    patient.name = input_dict['name']
+    if input_dict['medical_image'] != '':
+        patient.medical_image.append(input_dict['medical_image'])
+        patient.medical_timestamp.append(timestamp)
+    if input_dict['ECG_image'] != '':
+        patient.ECG_image.append(input_dict['ECG_image'])
+        patient.heart_rate.append(input_dict['heart_rate'])
+        patient.ECG_timestamp.append(timestamp)
+
+
 def add_patient(input_dict, timestamp):
     """Add new patient to database
 
@@ -46,13 +73,7 @@ def add_patient(input_dict, timestamp):
                 heart_rate=[],
                 ECG_image=[],
                 ECG_timestamp=[])
-    if input_dict['medical_image'] != '':
-        p.medical_image.append(input_dict['medical_image'])
-        p.medical_timestamp.append(timestamp)
-    if input_dict['ECG_image'] != '':
-        p.ECG_image.append(input_dict['ECG_image'])
-        p.heart_rate.append(input_dict['heart_rate'])
-        p.ECG_timestamp.append(timestamp)
+    append_patient_info(p, input_dict, timestamp)
     result = p.save()
     return result.MRN
 
@@ -94,15 +115,7 @@ def update_patient(input_dict, timestamp):
     entry
     """
     p = Patient.objects.raw({"_id": input_dict['MRN']}).first()
-    if input_dict['name'] != '':
-        p.name = input_dict['name']
-    if input_dict['medical_image'] != '':
-        p.medical_image.append(input_dict['medical_image'])
-        p.medical_timestamp.append(timestamp)
-    if input_dict['ECG_image'] != '':
-        p.ECG_image.append(input_dict['ECG_image'])
-        p.heart_rate.append(input_dict['heart_rate'])
-        p.ECG_timestamp.append(timestamp)
+    append_patient_info(p, input_dict, timestamp)
     result = p.save()
     return result
 
