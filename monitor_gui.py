@@ -89,7 +89,7 @@ def main_window():
             latest_ECG_label.image = tk_latest_ECG_image
             latest_ECG_label.configure(image=tk_latest_ECG_image)
             date_latest_ECG_string.set(record["ECG_timestamp"][-1])
-    
+
     def display_record_cmd(event):
         """ Get record of the selected MRN and display latest ECG
         When the user select a value under the dropdown box, this function
