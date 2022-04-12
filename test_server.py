@@ -31,6 +31,38 @@ def test_add_patient(info_for_test):
     assert answer == info_for_test['MRN']
 
 
+def test_append_patient_info():
+    from server import append_patient_info
+    from database import Patient
+    p = Patient(MRN=33,
+                name='',
+                medical_image=[],
+                medical_timestamp=[],
+                heart_rate=[],
+                ECG_image=[],
+                ECG_timestamp=[])
+    append_patient_info(p,
+                        {'MRN': 33,
+                         'name': 'Smith.J',
+                         'medical_image': 'mi_string',
+                         'heart_rate': -1,
+                         'ECG_image': ''},
+                        "2022-04-05 16:09:26")
+    assert p.name == 'Smith.J'
+    assert p.medical_image == ['mi_string']
+    assert p.medical_timestamp == ["2022-04-05 16:09:26"]
+    append_patient_info(p,
+                        {'MRN': 33,
+                         'name': 'Smith.J',
+                         'medical_image': '',
+                         'heart_rate': 72,
+                         'ECG_image': 'ei_string'},
+                        "2022-04-05 16:13:43")
+    assert p.heart_rate == [72]
+    assert p.ECG_image == ['ei_string']
+    assert p.ECG_timestamp == ["2022-04-05 16:13:43"]
+
+
 def test_has_patient():
     from database import Patient
     from server import has_patient
@@ -66,7 +98,7 @@ def test_has_patient():
       'ECG_image': 'some ECG_image',
       'heart_rate': 72},
      {'MRN': 114523,
-      'name': 'Smith.J',
+      'name': '',
       'medical_image': ['some medical_image'],
       'medical_timestamp': ["2022-04-05 16:09:26"],
       'ECG_image': ['some ECG_image'],
