@@ -3,7 +3,7 @@ import requests
 import json
 
 
-server = "http://127.0.0.1:5000"
+server = "http://vcm-25959.vm.duke.edu:5000"
 
 
 def setup_patient_data(MRN, name, medical_image, heart_rate, ECG_image):

@@ -10,4 +10,3 @@ pandas
 matplotlib
 scipy
 numpy
-loggings
