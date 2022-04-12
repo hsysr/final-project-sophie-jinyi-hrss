@@ -72,27 +72,10 @@ def main_window():
         mrnlist = api.display_mrnlist_driver()
         MRN_dropdown["values"] = mrnlist
 
-    def display_record_cmd(event):
-        """ Get record of the selected MRN and display latest ECG
-        When the user select a value under the dropdown box, this function
-        would run store the MRN value under MRN_dropdown.now, and
-        will call update_record_handler to update the display of the latest
-        ECG image.
-
-        :param event: event user select a value under the combobox
-        """
-        reset_record()
-        MRN_dropdown.now = MRN_dropdown["values"][MRN_dropdown.current()]
-        status_label.configure(
-            text="Patient {} selected".format(MRN_dropdown.now))
-        update_record_handler()
-
-    def update_record_handler():
-        """ Handles update_record driver, store record and display the
-        latest ECG When the user select a value under the dropdown box,
-        this function would run and call te driver to update the record.
-        THis function would also run every 2000msec, to automatically
-        update the record.
+    def get_record_display_latest_ECG():
+        """ Display latest ECG
+        This function update the display of the latest infromation of the
+        patient. The name, recent ECG and heart rate.
         """
         global record
         if MRN_dropdown.now is None:
@@ -106,6 +89,32 @@ def main_window():
             latest_ECG_label.image = tk_latest_ECG_image
             latest_ECG_label.configure(image=tk_latest_ECG_image)
             date_latest_ECG_string.set(record["ECG_timestamp"][-1])
+
+    def display_record_cmd(event):
+        """ Get record of the selected MRN and display latest ECG
+        When the user select a value under the dropdown box, this function
+        would run store the MRN value under MRN_dropdown.now, and
+        will call update_record_handler to update the display of the latest
+        ECG image.
+
+        :param event: event user select a value under the combobox
+        """
+        global record
+        reset_record()
+        MRN_dropdown.now = MRN_dropdown["values"][MRN_dropdown.current()]
+        status_label.configure(
+            text="Patient {} selected".format(MRN_dropdown.now))
+        get_record_display_latest_ECG()
+
+    def update_record_handler():
+        """ Handles update_record driver, store record and display the
+        latest ECG When the user select a value under the dropdown box,
+        this function would run and call te driver to update the record.
+        THis function would also run every 2000msec, to automatically
+        update the record.
+        """
+        global record
+        get_record_display_latest_ECG()
         root.after(2000, update_record_handler)
 
     def format_image(base64_string):
