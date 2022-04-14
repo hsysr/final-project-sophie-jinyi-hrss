@@ -141,13 +141,13 @@ This route retrieves record of the selected MRN as a dictionary in the format as
 ```
 where
 
-* `<medical_record_number>` is a integer containing medical record number
+* `<medical_record_number>` is an integer containing medical record number
 * `<patient_name_str>` is a string containing patient name
 * `<medical_image_base64_str>` is a string containing medical image in base64 format
 * `<timestamp_medical image_str>` is a string containing upload datetime of the medical image.
 * `<heart_rate_int>` is a integer containing heart rate
 * `<ECG_image_base64_str>` is a string containing ECG trace image in base64 format
-* `<timestamp_ECG_image_str>` is a string containing upload datetime of the medical image.
+* `<timestamp_ECG_image_str>` is a string containing upload datetime of the ECG image.
 
 The given MRN must be string of integer.
 
