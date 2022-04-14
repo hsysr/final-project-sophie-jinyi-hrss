@@ -98,7 +98,7 @@ def test_has_patient():
       'ECG_image': 'some ECG_image',
       'heart_rate': 72},
      {'MRN': 114523,
-      'name': '',
+      'name': 'Smith.J',
       'medical_image': ['some medical_image'],
       'medical_timestamp': ["2022-04-05 16:09:26"],
       'ECG_image': ['some ECG_image'],
