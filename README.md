@@ -93,6 +93,10 @@ In the monitoring station GUI window, the user will be asked to select patient M
 + Click `Cancel` button to end the program.
 + The status label would show message when you select an MRN or select/download an image.
 
+### Video instruction
+You could access the video instruction by the link:
+https://duke.box.com/s/iyp1zxx5grmc39ri2bmfean9vr292jty
+
 ## Server Routes
 
 ### POST /api/patient/upload
