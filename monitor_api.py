@@ -41,5 +41,8 @@ def generate_filename(timestamp, image_type):
 
     :returns: str, filename of the image to be download
     """
-    filename = timestamp[:10] + "_" + image_type + ".jpg"
+    timestamp = timestamp.replace(":", "_")
+    timestamp = timestamp.replace(" ", "_")
+    timestamp = timestamp.replace("-", "_")
+    filename = timestamp + "_" + image_type + ".jpg"
     return filename
