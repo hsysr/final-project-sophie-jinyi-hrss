@@ -41,7 +41,8 @@ def append_patient_info(patient, input_dict, timestamp):
 
     :returns: None
     """
-    patient.name = input_dict['name']
+    if input_dict['name'] != '':
+        patient.name = input_dict['name']
     if input_dict['medical_image'] != '':
         patient.medical_image.append(input_dict['medical_image'])
         patient.medical_timestamp.append(timestamp)
@@ -67,7 +68,7 @@ def add_patient(input_dict, timestamp):
     :returns: int containing MRN of the patient added
     """
     p = Patient(MRN=input_dict['MRN'],
-                name=input_dict['name'],
+                name='',
                 medical_image=[],
                 medical_timestamp=[],
                 heart_rate=[],
